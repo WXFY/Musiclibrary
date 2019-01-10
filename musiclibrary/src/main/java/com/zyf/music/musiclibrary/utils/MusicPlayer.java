@@ -51,7 +51,9 @@ public class MusicPlayer {
 
         @Override
         public void onStart() {
-
+            for (OnProgressListener value : listeners.values()) {
+                value.onStart();
+            }
         }
     };
     private static Handler handler = new Handler(){

@@ -151,7 +151,8 @@ public class MusicPlayerService extends Service{
                     .fileNameGenerator(new MyFileNameGenerator()).build();
         }
         public void setDataSource(final String path) {
-            mIsInitialized = setDataSourceImpl(mCurrentMediaPlayer, path);
+            mIsInitialized = false;
+            setDataSourceImpl(mCurrentMediaPlayer, path);
             if (mIsInitialized) {
                 setNextDataSource(null);
             }
@@ -280,20 +281,19 @@ public class MusicPlayerService extends Service{
             return mIsInitialized;
         }
         public void start() {
-            if(isInitialized()){
-                mCurrentMediaPlayer.setOnPreparedListener(mp -> {
-                    int count = mCallbacks.beginBroadcast();
-                    for (int i = 0; i < count; i++) {
-                        try {
-                            mCallbacks.getBroadcastItem(i).onStart();
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
+            mCurrentMediaPlayer.setOnPreparedListener(mp -> {
+                int count = mCallbacks.beginBroadcast();
+                for (int i = 0; i < count; i++) {
+                    try {
+                        mCallbacks.getBroadcastItem(i).onStart();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
                     }
-                    mCallbacks.finishBroadcast();
-                    mCurrentMediaPlayer.start();
-                });
-            }
+                }
+                mCallbacks.finishBroadcast();
+                mCurrentMediaPlayer.start();
+                mIsInitialized = true;
+            });
         }
 
         public void release() {
