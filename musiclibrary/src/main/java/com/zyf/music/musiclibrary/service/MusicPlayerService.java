@@ -137,6 +137,7 @@ public class MusicPlayerService extends Service{
         RemoteCallbackList<IMusicPlayerAidlInterface> mCallbacks;
         private HttpProxyCacheServer proxy;
         private int buffer = 0;
+        private boolean isPlay = false;
         public MultiPlayer(final MusicPlayerService service,RemoteCallbackList<IMusicPlayerAidlInterface> mCallbacks) {
             this.service = service;
             this.mCallbacks = mCallbacks;
@@ -152,6 +153,7 @@ public class MusicPlayerService extends Service{
         }
         public void setDataSource(final String path) {
             mIsInitialized = false;
+            isPlay = false;
             setDataSourceImpl(mCurrentMediaPlayer, path);
             if (mIsInitialized) {
                 setNextDataSource(null);
@@ -169,7 +171,23 @@ public class MusicPlayerService extends Service{
                     player.setDataSource(proxy.getProxyUrl(path));
                 }
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                player.setOnPreparedListener(mp -> {
+                    if(isPlay){
+                        player.start();
+                        int count = mCallbacks.beginBroadcast();
+                        for (int i = 0; i < count; i++) {
+                            try {
+                                mCallbacks.getBroadcastItem(i).onStart();
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        mCallbacks.finishBroadcast();
+                    }
+                    mIsInitialized = true;
+                });
                 player.prepareAsync();
+
             } catch (final IOException todo) {
                 int count = mCallbacks.beginBroadcast();
                 for (int i = 0; i < count; i++) {
@@ -281,19 +299,10 @@ public class MusicPlayerService extends Service{
             return mIsInitialized;
         }
         public void start() {
-            mCurrentMediaPlayer.setOnPreparedListener(mp -> {
-                int count = mCallbacks.beginBroadcast();
-                for (int i = 0; i < count; i++) {
-                    try {
-                        mCallbacks.getBroadcastItem(i).onStart();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }
-                mCallbacks.finishBroadcast();
+            isPlay = true;
+            if(isInitialized()){
                 mCurrentMediaPlayer.start();
-                mIsInitialized = true;
-            });
+            }
         }
 
         public void release() {
