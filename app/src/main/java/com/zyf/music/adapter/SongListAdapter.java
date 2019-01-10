@@ -17,6 +17,7 @@ public class SongListAdapter extends BaseQuickAdapter<Song,BaseViewHolder> {
     @Override
     protected void convert(BaseViewHolder helper, Song item) {
         helper.setText(R.id.tv_name,item.getName());
+        helper.setText(R.id.tv_time,item.getTime());
     }
 
     public SongListAdapter(@Nullable List<Song> data) {

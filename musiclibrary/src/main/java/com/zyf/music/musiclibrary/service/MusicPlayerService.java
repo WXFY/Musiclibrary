@@ -69,7 +69,7 @@ public class MusicPlayerService extends Service{
 
         @Override
         public void change(String path) {
-            multiPlayer.setNextDataSource(path);
+            //multiPlayer.setNextDataSource(path);
         }
 
         @Override
@@ -126,6 +126,7 @@ public class MusicPlayerService extends Service{
         multiPlayer.release();
         manager.abandonAudioFocus();
         multiPlayer = null;
+        manager = null;
     }
 
     private static class MultiPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener,MediaPlayer.OnBufferingUpdateListener {
@@ -167,13 +168,17 @@ public class MusicPlayerService extends Service{
                     player.setDataSource(proxy.getProxyUrl(path));
                 }
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-                player.prepare();
+                player.prepareAsync();
             } catch (final IOException todo) {
-
-                return false;
-            } catch (final IllegalArgumentException todo) {
-
+                int count = mCallbacks.beginBroadcast();
+                for (int i = 0; i < count; i++) {
+                    try {
+                        mCallbacks.getBroadcastItem(i).onError();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mCallbacks.finishBroadcast();
                 return false;
             }
             player.setOnCompletionListener(this);
@@ -240,7 +245,17 @@ public class MusicPlayerService extends Service{
         //播放错误
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
-            return false;
+            int count = mCallbacks.beginBroadcast();
+            for (int i = 0; i < count; i++) {
+                try {
+                    mCallbacks.getBroadcastItem(i).onError();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+            mCallbacks.finishBroadcast();
+            mCurrentMediaPlayer.reset();
+            return true;
         }
 
         @Override
@@ -265,7 +280,20 @@ public class MusicPlayerService extends Service{
             return mIsInitialized;
         }
         public void start() {
-            mCurrentMediaPlayer.start();
+            if(isInitialized()){
+                mCurrentMediaPlayer.setOnPreparedListener(mp -> {
+                    int count = mCallbacks.beginBroadcast();
+                    for (int i = 0; i < count; i++) {
+                        try {
+                            mCallbacks.getBroadcastItem(i).onStart();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    mCallbacks.finishBroadcast();
+                    mCurrentMediaPlayer.start();
+                });
+            }
         }
 
         public void release() {
@@ -274,7 +302,9 @@ public class MusicPlayerService extends Service{
 
 
         public void pause() {
-            mCurrentMediaPlayer.pause();
+            if(isInitialized()){
+                mCurrentMediaPlayer.pause();
+            }
         }
 
 
@@ -311,7 +341,10 @@ public class MusicPlayerService extends Service{
         }
 
         public boolean isPlay() {
-            return mCurrentMediaPlayer.isPlaying();
+            if(isInitialized()){
+                return mCurrentMediaPlayer.isPlaying();
+            }
+            return false;
         }
         public class MyFileNameGenerator implements FileNameGenerator {//缓存的命名规则
             public String generate(String url) {

@@ -6,6 +6,15 @@ public class Song implements SongName{
     private String path;
     private String name;
     private String lrc;
+    private String time;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public String getLrc() {
         return lrc;

@@ -21,11 +21,11 @@
                 android:textSize="16sp" />
             <ImageView
                 android:id="@+id/tv_cancle"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:padding="5dp"
+                android:padding="10dp"
                 android:src="@mipmap/close_blank_icon" />
         </RelativeLayout>
         <View

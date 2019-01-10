@@ -7,6 +7,7 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
@@ -197,6 +199,20 @@ public class MainActivity extends AppCompatActivity {
                     showLyric(((Song)song).getLrc());
                     title.setText(((Song)song).getName());
                 }
+            }
+
+            @Override
+            public void onError() {
+                runOnUiThread(()->{
+                    Toast.makeText(MainActivity.this,"歌曲加载失败",Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onStart() {
+                runOnUiThread(()->{
+                    initSong();
+                });
             }
         });
         findViewById(R.id.list_song).setOnClickListener(v->{

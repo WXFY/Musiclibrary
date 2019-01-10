@@ -6,4 +6,6 @@ package com.zyf.music.musiclibrary.utils;
 interface IMusicPlayerAidlInterface {
    void bufferingProgress(int percent);
    void onCompletion(boolean isNext);
+   void onError();
+   void onStart();
 }

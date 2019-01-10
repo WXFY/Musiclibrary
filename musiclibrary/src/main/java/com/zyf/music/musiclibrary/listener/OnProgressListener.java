@@ -5,4 +5,6 @@ public interface OnProgressListener {
     void onStringProgress(String duration,String current);
     void onBufferingUpdate(int percent);
     void onCurrentSong(Object song);
+    void onError();
+    void onStart();
 }

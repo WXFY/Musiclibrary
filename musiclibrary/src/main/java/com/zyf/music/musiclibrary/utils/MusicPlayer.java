@@ -41,6 +41,18 @@ public class MusicPlayer {
         public void onCompletion(boolean isNext) {
             completion(isNext);
         }
+
+        @Override
+        public void onError() {
+            for (OnProgressListener value : listeners.values()) {
+                value.onError();
+            }
+        }
+
+        @Override
+        public void onStart() {
+
+        }
     };
     private static Handler handler = new Handler(){
         @Override
@@ -93,6 +105,7 @@ public class MusicPlayer {
         handler.removeMessages(0);
         pos = -1;
         next = -1;
+        listeners.clear();
         if(list!=null){
             list.clear();
             list = null;
@@ -139,31 +152,8 @@ public class MusicPlayer {
     }
 
     private static void readyMusic() {
-        if(list!=null&&list.size()>pos){
-            openFile(((SongName)(list.get(pos))).SongPath());
-            switch (mode){
-                case SINGLESONG:
-                    change(((SongName)(list.get(pos))).SongPath());
-                    break;
-                case LISTLOOP:
-                    if(pos>=list.size()-1){
-                        next = 0;
-                    }else {
-                        next = pos+1;
-                    }
-                    change(((SongName)(list.get(next))).SongPath());
-                    break;
-                case LISTORDER:
-                    if(pos<list.size()-1){
-                        next = pos+1;
-                        change(((SongName)(list.get(next))).SongPath());
-                    }
-                    break;
-                case RANDOM:
-                    next = (int)(Math.random()*(list.size()-1));
-                    change(((SongName)(list.get(next))).SongPath());
-                    break;
-            }
+        if(list!=null&&list.size()>pos) {
+            openFile(((SongName) (list.get(pos))).SongPath());
         }
     }
 
@@ -238,7 +228,7 @@ public class MusicPlayer {
     private static void completion(boolean isNext){
         if(list!=null&&list.size()>0){
             try {
-                switch (mode){
+                /*switch (mode){
                     case RANDOM:
                         if(isNext){
                             pos = next;
@@ -304,6 +294,36 @@ public class MusicPlayer {
                             next = pos++;
                             change(((SongName)(list.get(next))).SongPath());
                         }
+                        break;
+                }*/
+                switch (mode){
+                    case RANDOM:
+                        pos = (int)(Math.random()*(list.size()-1));
+                        openFile(((SongName)(list.get(pos))).SongPath());
+                        playOrPause();
+                        break;
+                    case LISTLOOP:
+                        if(pos>=list.size()-1){
+                            pos = 0;
+                        }else {
+                            pos++;
+                        }
+                        openFile(((SongName)(list.get(pos))).SongPath());
+                        playOrPause();
+                        break;
+                    case SINGLESONG:
+                        openFile(((SongName)(list.get(pos))).SongPath());
+                        playOrPause();
+                        break;
+                    case LISTORDER:
+                        if(pos>=list.size()-1){
+                            seek(0);
+                            return;
+                        }else {
+                            pos++;
+                        }
+                        openFile(((SongName)(list.get(pos))).SongPath());
+                        playOrPause();
                         break;
                 }
                 for (OnProgressListener value : listeners.values()) {
