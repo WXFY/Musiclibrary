@@ -25,8 +25,8 @@ public class MusicPlayer {
     private static PlaybackMode mode = PlaybackMode.LISTLOOP;
     private static final WeakHashMap<Context, ServiceBinder> mConnectionMap;
     private static List<?> list;
-    private static int pos =0;
-    private static int next = 0;
+    private static int pos = -1;
+    private static int next = -1;
     private static WeakHashMap<Class,OnProgressListener> listeners;
     private static IMusicPlayerAidlInterface listener = new IMusicPlayerAidlInterface.Stub() {
         @Override
@@ -91,6 +91,12 @@ public class MusicPlayer {
             return;
         }
         handler.removeMessages(0);
+        pos = -1;
+        next = -1;
+        if(list!=null){
+            list.clear();
+            list = null;
+        }
         try {
             mService.unRegisterLoginUser(listener);
         } catch (RemoteException e) {
@@ -317,6 +323,10 @@ public class MusicPlayer {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static List<?> getList() {
+        return list;
     }
 
     public static int getPos() {

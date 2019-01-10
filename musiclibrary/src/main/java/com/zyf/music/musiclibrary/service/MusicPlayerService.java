@@ -108,6 +108,7 @@ public class MusicPlayerService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mServiceStartId = startId;
+        manager.requestAudioFocus();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -123,6 +124,7 @@ public class MusicPlayerService extends Service{
     public void onDestroy() {
         super.onDestroy();
         multiPlayer.release();
+        manager.abandonAudioFocus();
         multiPlayer = null;
     }
 

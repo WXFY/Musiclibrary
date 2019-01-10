@@ -1,1 +1,2 @@
-include ':app', ':musiclibrary'
+include ':app'
+include ':musiclibrary'
