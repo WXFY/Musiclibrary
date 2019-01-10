@@ -1,23 +1,37 @@
 package com.zyf.music;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.bumptech.glide.request.RequestOptions;
 import com.zyf.music.model.Song;
 import com.zyf.music.musiclibrary.listener.OnProgressListener;
 import com.zyf.music.musiclibrary.utils.MusicPlayer;
 import com.zyf.music.musiclibrary.utils.PlaybackMode;
 import com.zyf.music.widget.LrcView;
+import com.zyf.music.widget.SongSelectorPicker;
 
 import java.io.File;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -25,18 +39,32 @@ public class MainActivity extends AppCompatActivity {
     AppCompatSeekBar seekbar;
     TextView startTime;
     TextView endTime;
-    TextView name;
-    Button mode;
+    ImageView mode;
     LrcView lrc;
     LrcView lrcFull;
-    private boolean lrcSingen = false;
+
+    TextView title;
+    LinearLayout topBg;
+    ImageView ivBack;
+    ImageView playIcon;
+    ImageView playAlbumIcon;
+    private ValueAnimator rotateAnimator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        findViewById(R.id.play).setOnClickListener((v)->{
+        playIcon = findViewById(R.id.play);
+        playIcon.setOnClickListener((v)->{
             MusicPlayer.playOrPause();
+            if(MusicPlayer.isPlaying()){
+                rotateAnimator.resume();
+                playIcon.setImageResource(R.mipmap.pause_icon);
+            }else {
+                rotateAnimator.pause();
+                playIcon.setImageResource(R.mipmap.play_icon);
+            }
+
         });
         findViewById(R.id.last).setOnClickListener((v)->{
             MusicPlayer.previous();
@@ -44,13 +72,55 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.next).setOnClickListener((v)->{
             MusicPlayer.next();
         });
-        name = findViewById(R.id.name);
+        topBg = findViewById(R.id.top_bg);
+        topBg.setPadding(0, getStatusBarHeight(), 0, 0);
+
+        title = findViewById(R.id.tv_title);
         startTime = findViewById(R.id.startTime);
         endTime = findViewById(R.id.endTime);
         seekbar = findViewById(R.id.seekbar);
         mode = findViewById(R.id.mode);
         lrc = findViewById(R.id.lrc_sing);
+        ivBack = findViewById(R.id.iv_back);
         lrcFull = findViewById(R.id.lrc_full);
+        ivBack.setImageResource(R.mipmap.black_back);
+        playAlbumIcon = findViewById(R.id.play_icon);
+        ivBack.setOnClickListener(v -> {
+            finish();
+        });
+        Glide.with(this).load(R.mipmap.default_music_icon).thumbnail(0.1f).apply(RequestOptions.bitmapTransform(
+                new BitmapTransformation() {
+                    @Override
+                    public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
+
+                    }
+
+                    @Override
+                    protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+                        if(toTransform == null){
+                            return null;
+                        }
+                        int size = Math.min(toTransform.getWidth(), toTransform.getHeight());
+                        int x = (toTransform.getWidth() - size) / 2;
+                        int y = (toTransform.getHeight() - size) / 2;
+
+                        // TODO this could be acquired from the pool too
+                        Bitmap squared = Bitmap.createBitmap(toTransform, x, y, size, size);
+
+                        Bitmap result = pool.get(size, size, Bitmap.Config.ARGB_8888);
+                        if (result == null) {
+                            result = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+                        }
+                        Canvas canvas = new Canvas(result);
+                        Paint paint = new Paint();
+                        paint.setShader(new BitmapShader(squared, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP));
+                        paint.setAntiAlias(true);
+                        float r = size / 2f;
+                        canvas.drawCircle(r, r, r, paint);
+                        return result;
+                    }
+                }
+        )).into(playAlbumIcon);
 //        showLyric(new File(Environment.getExternalStorageDirectory(), "最美情侣.lrc"));
         lrcFull.setOnPlayClickListener(new LrcView.OnPlayClickListener() {
             @Override
@@ -62,53 +132,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onOutClick() {
                 lrc.setVisibility(View.VISIBLE);
-                lrcFull.setVisibility(View.GONE);
+                lrcFull.setVisibility(View.INVISIBLE);
+                playAlbumIcon.setVisibility(View.VISIBLE);
             }
         });
         lrc.setOnTouchListener((v, event) -> {
-            lrc.setVisibility(View.GONE);
+            lrc.setVisibility(View.INVISIBLE);
             lrcFull.setVisibility(View.VISIBLE);
+            playAlbumIcon.setVisibility(View.INVISIBLE);
             return false;
         });
         boolean play = getIntent().getBooleanExtra("play",false);
         if(play){
             MusicPlayer.playOrPause();
         }
-
-       /* List<Song> data = new ArrayList<>();
-        Song song1 = new Song(); //最美情侣
-        song1.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112002239.mp3");
-        song1.setName("最美情侣");
-        data.add(song1);
-
-
-        Song song2 = new Song(); //红昭愿
-        song2.setPath("http://sc1.111ttt.cn/2018/1/03/13/396131227447.mp3");
-        song2.setName("红昭愿");
-        data.add(song2);
-
-
-        Song song3 = new Song(); //追光者
-        song3.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112002347.mp3");
-        song3.setName("追光者");
-        data.add(song3);
-
-        Song song4 = new Song(); //远走高飞
-        song4.setPath("http://sc1.111ttt.cn/2017/1/05/09/298092036393.mp3");
-        song4.setName("远走高飞");
-        data.add(song4);
-
-        Song song5 = new Song(); //带你去旅行
-        song5.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112004168.mp3");
-        song5.setName("带你去旅行");
-        data.add(song5);
-        MusicPlayer.setList(data,4);*/
-        name.setText(((Song)MusicPlayer.getCurrentSong()).getName());
-        showLyric(((Song)MusicPlayer.getCurrentSong()).getLrc());
-        mode.setText(currentSongMode(MusicPlayer.getMode()));
+        openAnimation();
+        initSong();
+        mode.setImageResource(currentSongMode(MusicPlayer.getMode()));
         mode.setOnClickListener(v -> {
             MusicPlayer.changeMode();
-            mode.setText(currentSongMode(MusicPlayer.getMode()));
+            mode.setImageResource(currentSongMode(MusicPlayer.getMode()));
         });
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -151,13 +194,39 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCurrentSong(Object song) {
                 if(song!=null&&song instanceof Song){
-                    name.setText(((Song)song).getName());
                     showLyric(((Song)song).getLrc());
+                    title.setText(((Song)song).getName());
                 }
             }
         });
-
+        findViewById(R.id.list_song).setOnClickListener(v->{
+            SongSelectorPicker picker = new SongSelectorPicker(MainActivity.this,(pos)->{
+                MusicPlayer.setList(MusicPlayer.getList(),pos);
+                MusicPlayer.playOrPause();
+                initSong();
+            },(List<Song>) (MusicPlayer.getList()));
+            picker.show();
+        });
     }
+    private void initSong(){
+        if(MusicPlayer.isPlaying()){
+            rotateAnimator.resume();
+            playIcon.setImageResource(R.mipmap.pause_icon);
+        }else {
+            rotateAnimator.pause();
+            playIcon.setImageResource(R.mipmap.play_icon);
+        }
+        title.setText(((Song)MusicPlayer.getCurrentSong()).getName());
+        showLyric(((Song)MusicPlayer.getCurrentSong()).getLrc());
+    }
+    private void openAnimation() {
+        rotateAnimator = ObjectAnimator.ofFloat(playAlbumIcon,"rotation",0f,360f);
+        rotateAnimator.setInterpolator(new LinearInterpolator());
+        rotateAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        rotateAnimator.setDuration(10000);
+        rotateAnimator.start();
+    }
+
     public void showLyric(File file) {
         if (file == null) {
             lrc.setLabel("暂无歌词");
@@ -178,23 +247,44 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-    private String currentSongMode(PlaybackMode mode) {
-        String modeStr = "列表顺序";
+    private int currentSongMode(PlaybackMode mode) {
+        int modeRes = R.mipmap.list_loop_icon;
         switch (mode){
             case SINGLESONG:
-                modeStr = "单曲循环";
+                modeRes = R.mipmap.singensong_icon;
                 break;
             case RANDOM:
-                modeStr = "随机播放";
+                modeRes = R.mipmap.random_icon;
                 break;
             case LISTLOOP:
-                modeStr = "列表循环";
+                modeRes = R.mipmap.list_loop_icon;
                 break;
             case LISTORDER:
-                modeStr = "列表顺序";
+                modeRes = R.mipmap.list_loop_icon;
                 break;
         }
-        return modeStr;
+        return modeRes;
+    }
+    /**
+     * 获取当前设备状态栏高度
+     *
+     * @return
+     */
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(rotateAnimator!=null&&rotateAnimator.isRunning()){
+            rotateAnimator.cancel();
+            playAlbumIcon.clearAnimation();
+        }
+    }
 }

@@ -9,12 +9,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.zyf.music.adapter.SongListAdapter;
 import com.zyf.music.model.Song;
+import com.zyf.music.musiclibrary.listener.OnProgressListener;
 import com.zyf.music.musiclibrary.utils.MusicPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class AlbumActivity extends AppCompatActivity {
     private ImageView topImage;
@@ -35,7 +40,7 @@ public class AlbumActivity extends AppCompatActivity {
         topBg = findViewById(R.id.top_bg);
         topBg.setPadding(0, getStatusBarHeight(), 0, 0);
         title = findViewById(R.id.tv_title);
-        title.setTextColor(0xFFFFFF);
+        title.setTextColor(0xFFFFFFFF);
         title.setText("页面名称");
         recycler.setLayoutManager(new LinearLayoutManager(this));
         List<Song> data = new ArrayList<>();
@@ -84,7 +89,41 @@ public class AlbumActivity extends AppCompatActivity {
             }
             startActivity(intent);
         });
+        MusicPlayer.setListener(this.getClass(), new OnProgressListener() {
+            @Override
+            public void onLongProgress(long duration, long current) {
+
+            }
+
+            @Override
+            public void onStringProgress(String duration, String current) {
+
+            }
+
+            @Override
+            public void onBufferingUpdate(int percent) {
+
+            }
+
+            @Override
+            public void onCurrentSong(Object song) {
+                if(adapter!=null){
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+        Glide.with(this).load(R.mipmap.default_music_icon).apply(RequestOptions.bitmapTransform(new BlurTransformation(4, 15))).into(topImage);
+       /* Glide.with(this).load(R.mipmap.default_music_icon).bitmapTransform(new BlurTransformation(this, 15)).into(topImage);*/
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(adapter!=null){
+            adapter.notifyDataSetChanged();
+        }
+    }
+
     /**
      * 获取当前设备状态栏高度
      *

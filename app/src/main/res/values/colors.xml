@@ -2,9 +2,12 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#4B86FA</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="blue">#4B86FA</color>
+    <color name="black_1">#333333</color>
+    <color name="split_line">#11112233</color>
 
     <color name="lrc_normal_text_color">#9E9E9E</color>
     <color name="lrc_current_text_color">#FF4081</color>

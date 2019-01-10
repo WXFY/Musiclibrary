@@ -20,4 +20,12 @@
             <enum name="right" value="3"/>
         </attr>
     </declare-styleable>
+
+    <!--播放动态条-->
+    <declare-styleable name="Indicator">
+        <attr name="bar_num" format="integer" />
+        <attr name="duration" format="integer" />
+        <attr name="bar_color" format="color" />
+        <attr name="step_num" format="integer" />
+    </declare-styleable>
 </resources>

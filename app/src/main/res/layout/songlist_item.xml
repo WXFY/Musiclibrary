@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -20,23 +21,35 @@
 
         <TextView
             android:id="@+id/tv_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:text=""
             android:textColor="#FF728080"
             android:textSize="14sp" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="00:00"
+                android:textColor="#FF728080"
+                android:textSize="14sp" />
+            <com.zyf.music.widget.MusicIndicator
+                android:id="@+id/indicator"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="10dp"
+                app:bar_color="@color/blue"
+                app:bar_num="4"
+                app:duration="3000"
+                app:step_num="6" />
+        </RelativeLayout>
 
-        <TextView
-            android:id="@+id/tv_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:gravity="right"
-            android:paddingRight="20dp"
-            android:text="00:00"
-            android:textColor="#FF728080"
-            android:textSize="14sp" />
 
     </LinearLayout>
 

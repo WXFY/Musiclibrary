@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher"/>
+        android:src="@mipmap/default_music_icon"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
                 android:id="@+id/album_image"
                 android:layout_width="130dp"
                 android:layout_height="130dp"
-                android:src="@mipmap/ic_launcher"/>
+                android:src="@mipmap/default_music_icon"/>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
