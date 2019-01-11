@@ -32,7 +32,6 @@ public class MusicPlayer {
         @Override
         public void bufferingProgress(int percent) {
             for (OnProgressListener value : listeners.values()) {
-                Log.e("percent","percent==>>"+percent+"  "+"duration==>"+duration());
                 value.onBufferingUpdate((int)(percent*duration()));
             }
         }

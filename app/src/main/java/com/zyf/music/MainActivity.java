@@ -70,9 +70,11 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.last).setOnClickListener((v)->{
             MusicPlayer.previous();
+            initSong();
         });
         findViewById(R.id.next).setOnClickListener((v)->{
             MusicPlayer.next();
+            initSong();
         });
         topBg = findViewById(R.id.top_bg);
         topBg.setPadding(0, getStatusBarHeight(), 0, 0);
@@ -211,7 +213,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStart() {
                 runOnUiThread(()->{
-                    initSong();
+                    try {
+                        Thread.sleep(50);
+                        initSong();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 });
             }
         });
@@ -234,6 +241,9 @@ public class MainActivity extends AppCompatActivity {
         }
         title.setText(((Song)MusicPlayer.getCurrentSong()).getName());
         showLyric(((Song)MusicPlayer.getCurrentSong()).getLrc());
+        seekbar.setProgress(0);
+        startTime.setText("00:00");
+        endTime.setText("00:00");
     }
     private void openAnimation() {
         rotateAnimator = ObjectAnimator.ofFloat(playAlbumIcon,"rotation",0f,360f);

@@ -1,7 +1,12 @@
 package com.zyf.music.musiclibrary.service;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,14 +17,18 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.danikula.videocache.file.FileNameGenerator;
+import com.zyf.music.musiclibrary.R;
 import com.zyf.music.musiclibrary.utils.IMusicPlayerAidlInterface;
 
 import java.io.File;
 import java.io.IOException;
+
+import static android.app.NotificationManager.IMPORTANCE_HIGH;
 
 public class MusicPlayerService extends Service{
     private static final String TAG = "MusicPlayerService";
@@ -92,6 +101,8 @@ public class MusicPlayerService extends Service{
     private AudioFocusManager manager;
     private int mServiceStartId = -1;
     public final RemoteCallbackList<IMusicPlayerAidlInterface> mCallbacks  = new RemoteCallbackList<IMusicPlayerAidlInterface>();
+    private NotificationManager mNotificationManager;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -103,13 +114,36 @@ public class MusicPlayerService extends Service{
         super.onCreate();
         multiPlayer = new MultiPlayer(this,mCallbacks); //当player接收到播放状态相关的回调时,发送信息给handler处理
         manager = new AudioFocusManager(this);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
-
+    /**
+     * 构建Notification
+     * @return
+     */
+    private Notification buildNotification() {
+        NotificationChannel notificationChannel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationChannel = new NotificationChannel(getPackageName(),
+                    "睡眠", IMPORTANCE_HIGH);
+            mNotificationManager.createNotificationChannel(notificationChannel);
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this,getPackageName())
+                //设置小图标
+                .setSmallIcon(R.drawable.ic_music_note_white_48dp)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_music_note_white_48dp))
+                //设置通知标题
+                .setContentTitle("301睡眠")
+                //设置通知内容
+                .setContentText("音乐正在后台运行");
+        return builder.build();
+    }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mServiceStartId = startId;
-        manager.requestAudioFocus();
-        return super.onStartCommand(intent, flags, startId);
+        Log.e("mssds",startId+"");
+        int notificationId = hashCode();
+        startForeground(notificationId,buildNotification());
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -125,6 +159,8 @@ public class MusicPlayerService extends Service{
         super.onDestroy();
         multiPlayer.release();
         manager.abandonAudioFocus();
+        stopForeground(true);
+        mNotificationManager.cancel(hashCode()); //从状态栏中移除通知
         multiPlayer = null;
         manager = null;
     }
@@ -173,11 +209,16 @@ public class MusicPlayerService extends Service{
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 player.setOnPreparedListener(mp -> {
                     if(isPlay){
+                        if(!service.manager.requestAudioFocus()){
+                           return;
+                        }
                         player.start();
                         int count = mCallbacks.beginBroadcast();
                         for (int i = 0; i < count; i++) {
                             try {
-                                mCallbacks.getBroadcastItem(i).onStart();
+                                if(service.manager.requestAudioFocus()){
+                                    mCallbacks.getBroadcastItem(i).onStart();
+                                }
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             }
@@ -189,6 +230,7 @@ public class MusicPlayerService extends Service{
                 player.prepareAsync();
 
             } catch (final IOException todo) {
+                Log.e("IOException",todo.getMessage());
                 int count = mCallbacks.beginBroadcast();
                 for (int i = 0; i < count; i++) {
                     try {
@@ -264,6 +306,7 @@ public class MusicPlayerService extends Service{
         //播放错误
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
+            Log.e("MediaPlayer","what==>"+what+"--extra==>"+extra);
             int count = mCallbacks.beginBroadcast();
             for (int i = 0; i < count; i++) {
                 try {
@@ -301,6 +344,9 @@ public class MusicPlayerService extends Service{
         public void start() {
             isPlay = true;
             if(isInitialized()){
+                if(!service.manager.requestAudioFocus()){
+                    return;
+                }
                 mCurrentMediaPlayer.start();
             }
         }
@@ -368,7 +414,6 @@ public class MusicPlayerService extends Service{
         private AudioManager mAudioManager;
         private boolean isPausedByFocusLossTransient;
         private int mVolumeWhenFocusLossTransientCanDuck;
-
         public AudioFocusManager(@NonNull MusicPlayerService service) {
             this.service = service;
             mAudioManager = (AudioManager) service.getSystemService(AUDIO_SERVICE);
@@ -437,8 +482,10 @@ public class MusicPlayerService extends Service{
                     }
                     break;
             }
-        }
 
+
+
+        }
         private boolean willPlay() {
             return service.multiPlayer.isPlay();
         }

@@ -89,13 +89,19 @@ public class AlbumActivity extends AppCompatActivity {
         song6.setTime("03:49");
         data.add(song6);
 
-        Song song7 = new Song(); //9420
+        Song song7 = new Song();
         song7.setPath("http://www.ytmp3.cn/down/50491.mp3");
         song7.setName("年少有为");
         song7.setLrc("暂无歌词");
         song7.setTime("04:39");
         data.add(song7);
 
+        Song song8 = new Song();
+        song8.setPath("http://sc1.111ttt.cn/2017/1/05/09/298092041338.mp3");
+        song8.setName("我不相信");
+        song8.setLrc("暂无歌词");
+        song8.setTime("04:24");
+        data.add(song8);
 
         recycler.setAdapter(adapter = new SongListAdapter(data));
 
