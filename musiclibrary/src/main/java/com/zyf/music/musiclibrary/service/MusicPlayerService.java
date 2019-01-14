@@ -25,6 +25,7 @@ import com.danikula.videocache.HttpProxyCacheServer;
 import com.danikula.videocache.file.FileNameGenerator;
 import com.zyf.music.musiclibrary.R;
 import com.zyf.music.musiclibrary.utils.IMusicPlayerAidlInterface;
+import com.zyf.music.musiclibrary.utils.MusicFileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -195,7 +196,7 @@ public class MusicPlayerService extends Service{
         }
         private HttpProxyCacheServer newProxy() {
             return new HttpProxyCacheServer.Builder(service.getApplicationContext())
-                    .cacheDirectory(new File(Environment.getExternalStorageDirectory(), "music-cache"))
+                    .cacheDirectory(new File(Environment.getExternalStorageDirectory(), MusicFileUtils.getFilePath()))
                     .fileNameGenerator(new MyFileNameGenerator()).build();
         }
         public void setDataSource(final String path) {

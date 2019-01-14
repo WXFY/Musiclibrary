@@ -454,4 +454,8 @@ public class MusicPlayer {
             readyMusic();
         }
     }
+    public static void setMusicFilePath(String path) {
+        MusicFileUtils.setFilePath(path);
+    }
+
 }

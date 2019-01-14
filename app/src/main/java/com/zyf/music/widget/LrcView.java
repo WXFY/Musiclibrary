@@ -377,6 +377,10 @@ public class LrcView extends View {
         public boolean onDown(MotionEvent e) {
             if (hasLrc() && mOnPlayClickListener != null) {
                 return true;
+            }else {
+                if(mOnPlayClickListener != null){
+                    mOnPlayClickListener.onOutClick();
+                }
             }
             return super.onDown(e);
         }
@@ -430,6 +434,7 @@ public class LrcView extends View {
             }
             return super.onSingleTapConfirmed(e);
         }
+
     };
 
     private Runnable hideTimelineRunnable = new Runnable() {
