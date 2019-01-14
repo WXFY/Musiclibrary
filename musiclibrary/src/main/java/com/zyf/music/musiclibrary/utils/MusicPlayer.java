@@ -45,6 +45,7 @@ public class MusicPlayer {
         public void onError() {
             for (OnProgressListener value : listeners.values()) {
                 value.onError();
+                completion(true);
             }
         }
 
