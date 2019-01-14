@@ -6,6 +6,7 @@ import com.zyf.music.musiclibrary.utils.IMusicPlayerAidlInterface;
 interface IMusicAidlInterface {
         //打开文件
         void openFile(String path);
+        void openFileSong(String path,String Songname,String author);
         void change(String path);
         void stop();
         void pause();

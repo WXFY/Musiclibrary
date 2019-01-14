@@ -27,6 +27,7 @@ import com.zyf.music.model.Song;
 import com.zyf.music.musiclibrary.listener.OnProgressListener;
 import com.zyf.music.musiclibrary.utils.MusicPlayer;
 import com.zyf.music.musiclibrary.utils.PlaybackMode;
+import com.zyf.music.widget.ClockSelectorPicker;
 import com.zyf.music.widget.LrcView;
 import com.zyf.music.widget.SongSelectorPicker;
 
@@ -34,6 +35,8 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.zyf.music.utils.ClockSongUtils.isClock;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView ivBack;
     ImageView playIcon;
     ImageView playAlbumIcon;
+    ImageView clock;
     private ValueAnimator rotateAnimator;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,15 +69,14 @@ public class MainActivity extends AppCompatActivity {
                 rotateAnimator.pause();
                 playIcon.setImageResource(R.mipmap.play_icon);
             }
-
         });
         findViewById(R.id.last).setOnClickListener((v)->{
             MusicPlayer.previous();
-            initSong();
+            resetTime();
         });
         findViewById(R.id.next).setOnClickListener((v)->{
             MusicPlayer.next();
-            initSong();
+            resetTime();
         });
         topBg = findViewById(R.id.top_bg);
         topBg.setPadding(0, getStatusBarHeight(), 0, 0);
@@ -89,8 +91,15 @@ public class MainActivity extends AppCompatActivity {
         lrcFull = findViewById(R.id.lrc_full);
         ivBack.setImageResource(R.mipmap.black_back);
         playAlbumIcon = findViewById(R.id.play_icon);
+        clock = findViewById(R.id.clock);
         ivBack.setOnClickListener(v -> {
             finish();
+        });
+        clock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
         });
         Glide.with(this).load(R.mipmap.default_music_icon).thumbnail(0.1f).apply(RequestOptions.bitmapTransform(
                 new BitmapTransformation() {
@@ -152,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
         }
         openAnimation();
         initSong();
+        resetTime();
         mode.setImageResource(currentSongMode(MusicPlayer.getMode()));
         mode.setOnClickListener(v -> {
             MusicPlayer.changeMode();
@@ -227,7 +237,18 @@ public class MainActivity extends AppCompatActivity {
                 MusicPlayer.setList(MusicPlayer.getList(),pos);
                 MusicPlayer.playOrPause();
                 initSong();
+                resetTime();
             },(List<Song>) (MusicPlayer.getList()));
+            picker.show();
+        });
+        clock.setOnClickListener(v->{
+            ClockSelectorPicker picker = new ClockSelectorPicker(MainActivity.this,(pos)->{
+                if(!pos){
+                    clock.setImageResource(R.mipmap.timing_icon);
+                }else {
+                    clock.setImageResource(R.mipmap.timing_select_icon);
+                }
+            });
             picker.show();
         });
     }
@@ -239,12 +260,21 @@ public class MainActivity extends AppCompatActivity {
             rotateAnimator.pause();
             playIcon.setImageResource(R.mipmap.play_icon);
         }
-        title.setText(((Song)MusicPlayer.getCurrentSong()).getName());
+        if(!isClock){
+            clock.setImageResource(R.mipmap.timing_icon);
+        }else {
+            clock.setImageResource(R.mipmap.timing_select_icon);
+        }
+    }
+
+    private void resetTime() {
+        title.setText(((Song) MusicPlayer.getCurrentSong()).getName());
         showLyric(((Song)MusicPlayer.getCurrentSong()).getLrc());
         seekbar.setProgress(0);
         startTime.setText("00:00");
         endTime.setText("00:00");
     }
+
     private void openAnimation() {
         rotateAnimator = ObjectAnimator.ofFloat(playAlbumIcon,"rotation",0f,360f);
         rotateAnimator.setInterpolator(new LinearInterpolator());

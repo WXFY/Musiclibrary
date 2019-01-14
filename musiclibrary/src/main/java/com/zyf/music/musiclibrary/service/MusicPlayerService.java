@@ -18,6 +18,7 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
@@ -95,6 +96,12 @@ public class MusicPlayerService extends Service{
         public void unRegisterLoginUser(IMusicPlayerAidlInterface listener) {
             mCallbacks.unregister(listener);
         }
+
+        @Override
+        public void openFileSong(String path, String SongName, String author) {
+            multiPlayer.setDataSource(path);
+            //mNotificationManager.notify(hashCode(),buildNotification(SongName,author));
+        }
     };
 
     private MultiPlayer multiPlayer;
@@ -120,29 +127,33 @@ public class MusicPlayerService extends Service{
      * 构建Notification
      * @return
      */
-    private Notification buildNotification() {
+    private Notification buildNotification(String name,String author) {
         NotificationChannel notificationChannel = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notificationChannel = new NotificationChannel(getPackageName(),
-                    "睡眠", IMPORTANCE_HIGH);
+                    "music", IMPORTANCE_HIGH);
             mNotificationManager.createNotificationChannel(notificationChannel);
+        }
+        if(TextUtils.isEmpty(name)){
+            name = "音乐服务正在运行";
+            author = "";
         }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,getPackageName())
                 //设置小图标
                 .setSmallIcon(R.drawable.ic_music_note_white_48dp)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_music_note_white_48dp))
                 //设置通知标题
-                .setContentTitle("301睡眠")
+                .setContentTitle(name)
                 //设置通知内容
-                .setContentText("音乐正在后台运行");
+                .setContentText(author);
         return builder.build();
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mServiceStartId = startId;
-        Log.e("mssds",startId+"");
         int notificationId = hashCode();
-        startForeground(notificationId,buildNotification());
+        startForeground(notificationId,buildNotification("",""));
         return START_NOT_STICKY;
     }
 

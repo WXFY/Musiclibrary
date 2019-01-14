@@ -47,6 +47,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song1 = new Song(); //最美情侣
         song1.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112002239.mp3");
         song1.setName("最美情侣");
+        song1.setAuthor("白小白");
         song1.setTime("04:01");
         song1.setLrc(getResources().getString(R.string.song1));
         data.add(song1);
@@ -55,6 +56,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song2 = new Song(); //红昭愿
         song2.setPath("http://sc1.111ttt.cn/2018/1/03/13/396131227447.mp3");
         song2.setName("红昭愿");
+        song2.setAuthor("未知歌手");
         song2.setTime("02:53");
         song2.setLrc(getResources().getString(R.string.song2));
         data.add(song2);
@@ -63,6 +65,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song3 = new Song(); //追光者
         song3.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112002347.mp3");
         song3.setName("追光者");
+        song3.setAuthor("岑宁儿");
         song3.setTime("03:55");
         song3.setLrc(getResources().getString(R.string.song3));
         data.add(song3);
@@ -70,6 +73,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song4 = new Song(); //远走高飞
         song4.setPath("http://sc1.111ttt.cn/2017/1/05/09/298092036393.mp3");
         song4.setName("远走高飞");
+        song4.setAuthor("金志文");
         song4.setTime("03:55");
         song4.setLrc(getResources().getString(R.string.song4));
         data.add(song4);
@@ -77,6 +81,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song5 = new Song(); //带你去旅行
         song5.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112004168.mp3");
         song5.setName("带你去旅行");
+        song5.setAuthor("校长");
         song5.setTime("03:45");
         song5.setLrc(getResources().getString(R.string.song5));
         data.add(song5);
@@ -85,6 +90,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song6 = new Song(); //9420
         song6.setPath("http://sc1.111ttt.cn/2018/1/03/13/396131225385.mp3");
         song6.setName("9420");
+        song6.setAuthor("麦小兜");
         song6.setLrc("暂无歌词");
         song6.setTime("03:49");
         data.add(song6);
@@ -92,6 +98,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song7 = new Song();
         song7.setPath("http://www.ytmp3.cn/down/50491.mp3");
         song7.setName("年少有为");
+        song7.setAuthor("李荣浩");
         song7.setLrc("暂无歌词");
         song7.setTime("04:39");
         data.add(song7);
@@ -99,6 +106,7 @@ public class AlbumActivity extends AppCompatActivity {
         Song song8 = new Song();
         song8.setPath("http://sc1.111ttt.cn/2017/1/05/09/298092041338.mp3");
         song8.setName("我不相信");
+        song8.setAuthor("庄心妍");
         song8.setLrc("暂无歌词");
         song8.setTime("04:24");
         data.add(song8);

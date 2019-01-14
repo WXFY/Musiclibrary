@@ -110,6 +110,7 @@
                 android:padding="@dimen/dp_10"
                 android:src="@mipmap/collect_icon"/>
             <ImageView
+                android:id="@+id/clock"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"

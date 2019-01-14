@@ -174,6 +174,9 @@ public class MusicPlayer {
                 } else {
                     mService.play();
                 }
+                for (OnProgressListener value : listeners.values()) {
+                    value.onStart();
+                }
             }
         } catch (final Exception ignored) {
         }

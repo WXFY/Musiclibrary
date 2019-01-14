@@ -7,7 +7,7 @@ public class Song implements SongName{
     private String name;
     private String lrc;
     private String time;
-
+    private String author;
     public String getTime() {
         return time;
     }
@@ -40,8 +40,26 @@ public class Song implements SongName{
         return path;
     }
 
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     @Override
     public String SongPath() {
         return path;
+    }
+
+    @Override
+    public String SongName() {
+        return name;
+    }
+
+    @Override
+    public String SongAuthor() {
+        return author;
     }
 }
