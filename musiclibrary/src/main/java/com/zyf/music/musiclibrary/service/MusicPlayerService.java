@@ -101,7 +101,7 @@ public class MusicPlayerService extends Service{
         @Override
         public void openFileSong(String path, String SongName, String author) {
             multiPlayer.setDataSource(path);
-            //mNotificationManager.notify(hashCode(),buildNotification(SongName,author));
+            startForeground(hashCode(),buildNotification(SongName,author));
         }
     };
 

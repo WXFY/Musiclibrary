@@ -404,7 +404,8 @@ public class MusicPlayer {
     public static void openFile(final String path) {
         if (mService != null) {
             try {
-                mService.openFile(path);
+                SongName song = (SongName)getCurrentSong();
+                mService.openFileSong(path,song.SongName(),song.SongAuthor());
             } catch (final RemoteException ignored) {
             }
         }
