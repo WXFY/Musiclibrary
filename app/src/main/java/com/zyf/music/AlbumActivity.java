@@ -1,6 +1,9 @@
 package com.zyf.music;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +17,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.zyf.music.adapter.SongListAdapter;
 import com.zyf.music.model.Song;
 import com.zyf.music.musiclibrary.listener.OnProgressListener;
+import com.zyf.music.musiclibrary.utils.MusicFileUtils;
 import com.zyf.music.musiclibrary.utils.MusicPlayer;
 
 import java.util.ArrayList;
@@ -29,6 +33,8 @@ public class AlbumActivity extends AppCompatActivity {
     private TextView title;
     private SongListAdapter adapter;
     MusicPlayer.ServiceToken token;
+
+    private MusicBroadcastReceiver broadcastReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +49,11 @@ public class AlbumActivity extends AppCompatActivity {
         title.setTextColor(0xFFFFFFFF);
         title.setText("页面名称");
         recycler.setLayoutManager(new LinearLayoutManager(this));
+
+        broadcastReceiver = new MusicBroadcastReceiver();
+        IntentFilter filter = new IntentFilter(MusicFileUtils.MESSAGECILCK);
+        registerReceiver(broadcastReceiver, filter);
+
         List<Song> data = new ArrayList<>();
         Song song1 = new Song(); //最美情侣
         song1.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112002239.mp3");
@@ -188,5 +199,14 @@ public class AlbumActivity extends AppCompatActivity {
         MusicPlayer.unbindFromService(token);
         token = null;
         android.os.Process.killProcess(android.os.Process.myPid());
+        unregisterReceiver(broadcastReceiver);
+    }
+    public class MusicBroadcastReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(MusicPlayer.getCurrentSong()!=null){
+                startActivity(new Intent(AlbumActivity.this,MainActivity.class));
+            }
+        }
     }
 }

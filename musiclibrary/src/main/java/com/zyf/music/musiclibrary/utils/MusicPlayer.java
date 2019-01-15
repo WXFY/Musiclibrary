@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 public class MusicPlayer {
+
     public static IMusicAidlInterface mService = null;
     private static PlaybackMode mode = PlaybackMode.LISTLOOP;
     private static final WeakHashMap<Context, ServiceBinder> mConnectionMap;
@@ -54,6 +55,22 @@ public class MusicPlayer {
             for (OnProgressListener value : listeners.values()) {
                 value.onStart();
             }
+        }
+        /**
+         * 通知栏点击下一首方法回调
+         * 预留功能
+         * */
+        @Override
+        public void onNext() {
+
+        }
+        /**
+         * 通知栏点击上一首方法回调
+         * 预留功能
+         * */
+        @Override
+        public void onLast() {
+
         }
     };
     private static Handler handler = new Handler(){

@@ -2,7 +2,7 @@ package com.zyf.music.musiclibrary.utils;
 
 public class MusicFileUtils {
     private static String filePath = "music-cache";
-
+    public static String MESSAGECILCK = "com.musicplayer.play";
     public static void setFilePath(String filePath) {
         MusicFileUtils.filePath = filePath;
     }

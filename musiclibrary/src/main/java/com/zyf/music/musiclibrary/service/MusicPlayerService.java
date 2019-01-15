@@ -3,6 +3,7 @@ package com.zyf.music.musiclibrary.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -34,6 +35,8 @@ import static android.app.NotificationManager.IMPORTANCE_HIGH;
 
 public class MusicPlayerService extends Service{
     private static final String TAG = "MusicPlayerService";
+
+
     public IMusicAidlInterface.Stub musicConnection = new IMusicAidlInterface.Stub() {
         @Override
         public void openFile(String path) {
@@ -139,6 +142,8 @@ public class MusicPlayerService extends Service{
             name = "音乐服务正在运行";
             author = "";
         }
+        Intent intent = new Intent(MusicFileUtils.MESSAGECILCK);
+        PendingIntent broadcast = PendingIntent.getBroadcast(this,0,intent,0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,getPackageName())
                 //设置小图标
                 .setSmallIcon(R.drawable.ic_music_note_white_48dp)
@@ -146,7 +151,10 @@ public class MusicPlayerService extends Service{
                 //设置通知标题
                 .setContentTitle(name)
                 //设置通知内容
-                .setContentText(author);
+                .setContentText(author)
+                //设置点击通知事件
+                .setContentIntent(broadcast);
+        //TODO 实现通知栏进行控制上一曲，下一曲功能 播放暂停功能。暂时不做
         return builder.build();
     }
 
