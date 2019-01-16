@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -123,6 +125,14 @@ public class AlbumActivity extends AppCompatActivity {
         data.add(song8);
 
         recycler.setAdapter(adapter = new SongListAdapter(data));
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                MusicPlayer.setMusicFilePath("music_test");
+                MusicPlayer.setMusicIcon(BitmapFactory.decodeResource(getResources(), R.drawable.lrc_play));
+            }
+        }, 300);//100秒后执行Runnable中的run方法
 
         adapter.setOnItemClickListener((adapter, view, position) -> {
             Intent intent = new Intent(AlbumActivity.this,MainActivity.class);

@@ -23,4 +23,6 @@ interface IMusicAidlInterface {
         boolean isPlaying();
         void registerLoginUser(IMusicPlayerAidlInterface listener);
         void unRegisterLoginUser(IMusicPlayerAidlInterface listener);
+        void setFilePath(String path);
+        void setMusicIcon(String icon);
 }

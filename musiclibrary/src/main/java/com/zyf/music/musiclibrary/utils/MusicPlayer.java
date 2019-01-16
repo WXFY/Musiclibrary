@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -474,7 +475,20 @@ public class MusicPlayer {
         }
     }
     public static void setMusicFilePath(String path) {
-        MusicFileUtils.setFilePath(path);
+        if (mService != null) {
+            try {
+                mService.setFilePath(path);
+            } catch (final RemoteException ignored) {
+            }
+        }
+    }
+    public static void setMusicIcon(Bitmap icon) {
+        if (mService != null) {
+            try {
+                mService.setMusicIcon(Base64BitmapUtil.bitmapToBase64(icon));
+            } catch (final RemoteException ignored) {
+            }
+        }
     }
 
 }

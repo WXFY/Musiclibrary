@@ -106,6 +106,16 @@ public class MusicPlayerService extends Service{
             multiPlayer.setDataSource(path);
             startForeground(hashCode(),buildNotification(SongName,author));
         }
+
+        @Override
+        public void setFilePath(String path) {
+            MusicFileUtils.setFilePath(path);
+        }
+
+        @Override
+        public void setMusicIcon(String icon){
+            MusicFileUtils.setMusic_ico(icon);
+        }
     };
 
     private MultiPlayer multiPlayer;
@@ -147,7 +157,7 @@ public class MusicPlayerService extends Service{
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,getPackageName())
                 //设置小图标
                 .setSmallIcon(R.drawable.ic_music_note_white_48dp)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_music_note_white_48dp))
+                .setLargeIcon(MusicFileUtils.getMusic_ico(this))
                 //设置通知标题
                 .setContentTitle(name)
                 //设置通知内容
