@@ -481,14 +481,32 @@ public class MusicPlayerService extends Service{
                 // 永久丢失焦点，如被其他播放器抢占
                 case AudioManager.AUDIOFOCUS_LOSS:
                     if (willPlay()) {
-                        service.multiPlayer.stop();
+                        service.multiPlayer.pause();
+                        int count = service.mCallbacks.beginBroadcast();
+                        for (int i = 0; i < count; i++) {
+                            try {
+                                service.mCallbacks.getBroadcastItem(i).onStart();
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        service.mCallbacks.finishBroadcast();
                     }
                     break;
                 // 短暂丢失焦点，如来电
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     if (willPlay()) {
-                        service.multiPlayer.stop();
+                        service.multiPlayer.pause();
                         isPausedByFocusLossTransient = true;
+                        int count = service.mCallbacks.beginBroadcast();
+                        for (int i = 0; i < count; i++) {
+                            try {
+                                service.mCallbacks.getBroadcastItem(i).onStart();
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        service.mCallbacks.finishBroadcast();
                     }
                     break;
                 // 瞬间丢失焦点，如通知
