@@ -24,6 +24,7 @@ interface IMusicAidlInterface {
         boolean isPlaying();
         //注册服务监听
         void registerLoginUser(IMusicPlayerAidlInterface listener);
+        //结束服务监听
         void unRegisterLoginUser(IMusicPlayerAidlInterface listener);
         //设置音频缓存地址
         void setFilePath(String path);
