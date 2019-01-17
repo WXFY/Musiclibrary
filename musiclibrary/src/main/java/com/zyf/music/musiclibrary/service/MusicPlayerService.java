@@ -6,11 +6,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -30,8 +29,6 @@ import com.zyf.music.musiclibrary.utils.MusicFileUtils;
 
 import java.io.File;
 import java.io.IOException;
-
-import static android.app.NotificationManager.IMPORTANCE_HIGH;
 
 public class MusicPlayerService extends Service{
     private static final String TAG = "MusicPlayerService";
@@ -145,7 +142,11 @@ public class MusicPlayerService extends Service{
         NotificationChannel notificationChannel = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notificationChannel = new NotificationChannel(getPackageName(),
-                    "music", IMPORTANCE_HIGH);
+                    "music", NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.enableLights(false);
+            notificationChannel.enableVibration(false);
+            notificationChannel.setVibrationPattern(new long[]{0});
+            notificationChannel.setSound(null, null);
             mNotificationManager.createNotificationChannel(notificationChannel);
         }
         if(TextUtils.isEmpty(name)){
@@ -162,8 +163,13 @@ public class MusicPlayerService extends Service{
                 .setContentTitle(name)
                 //设置通知内容
                 .setContentText(author)
+                .setWhen(System.currentTimeMillis())
                 //设置点击通知事件
-                .setContentIntent(broadcast);
+                .setContentIntent(broadcast)
+                .setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
+            builder.setShowWhen(false);
+        }
         //TODO 实现通知栏进行控制上一曲，下一曲功能 播放暂停功能。暂时不做
         return builder.build();
     }

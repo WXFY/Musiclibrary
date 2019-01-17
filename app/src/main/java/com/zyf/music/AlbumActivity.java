@@ -123,17 +123,9 @@ public class AlbumActivity extends AppCompatActivity {
         song8.setLrc("暂无歌词");
         song8.setTime("04:24");
         data.add(song8);
-
         recycler.setAdapter(adapter = new SongListAdapter(data));
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                MusicPlayer.setMusicFilePath("music_test");
-                MusicPlayer.setMusicIcon(BitmapFactory.decodeResource(getResources(), R.drawable.lrc_play));
-            }
-        }, 300);//100秒后执行Runnable中的run方法
 
+        MusicFileUtils.setMusic_ico_bitmap(BitmapFactory.decodeResource(getResources(), R.drawable.lrc_play));
         adapter.setOnItemClickListener((adapter, view, position) -> {
             Intent intent = new Intent(AlbumActivity.this,MainActivity.class);
             if(MusicPlayer.isPlaying()&&MusicPlayer.getPos()==position){
