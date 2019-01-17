@@ -9,7 +9,6 @@ import com.zyf.music.musiclibrary.R;
 public class MusicFileUtils {
     private static String filePath = "music-cache";
     private static Bitmap music_ico;
-    private static Bitmap music_ico_str;
     public static String MESSAGECILCK = "com.musicplayer.play";
     public static void setFilePath(String filePath) {
         MusicFileUtils.filePath = filePath;
@@ -19,24 +18,13 @@ public class MusicFileUtils {
         return filePath;
     }
 
-    public static void setMusic_ico(String music_ico) {
+    public static void setMusic_ico(Bitmap music_ico) {
         try {
-            MusicFileUtils.music_ico = Base64BitmapUtil.base64ToBitmap(music_ico);
+            MusicFileUtils.music_ico = music_ico;
         } catch (Exception e) {
             e.printStackTrace();
             MusicFileUtils.music_ico = null;
         }
-    }
-
-    public static void setMusic_ico_bitmap(Bitmap music_ico) {
-        MusicFileUtils.music_ico_str = music_ico;
-    }
-
-    public static Bitmap getMusic_ico_bitmap(Context context) {
-        if(MusicFileUtils.music_ico_str==null){
-            return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_music_note_white_48dp);
-        }
-        return MusicFileUtils.music_ico_str;
     }
 
     public static Bitmap getMusic_ico(Context context) {

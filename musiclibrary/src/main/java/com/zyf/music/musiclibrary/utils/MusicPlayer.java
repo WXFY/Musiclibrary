@@ -153,7 +153,7 @@ public class MusicPlayer {
             mService = IMusicAidlInterface.Stub.asInterface(service);
             try {
                 mService.registerLoginUser(listener);
-                mService.setMusicIcon(Base64BitmapUtil.bitmapToBase64(MusicFileUtils.getMusic_ico_bitmap(mContext)));
+                mService.setMusicBitmap(MusicFileUtils.getMusic_ico(mContext));
                 mService.setFilePath(MusicFileUtils.getFilePath());
                 readyMusic();
             } catch (RemoteException e) {
@@ -484,7 +484,7 @@ public class MusicPlayer {
     }
     public static void setMusicIcon(Bitmap icon) {
         try {
-           MusicFileUtils.setMusic_ico_bitmap(icon);
+           MusicFileUtils.setMusic_ico(icon);
         } catch (Exception ignored) {
         }
     }

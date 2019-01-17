@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -101,16 +102,15 @@ public class MusicPlayerService extends Service{
         @Override
         public void openFileSong(String path, String SongName, String author) {
             multiPlayer.setDataSource(path);
-            startForeground(hashCode(),buildNotification(SongName,author));
+            mNotificationManager.notify(MusicPlayerService.this.hashCode(),buildNotification(SongName,author));
         }
 
         @Override
         public void setFilePath(String path) {
             MusicFileUtils.setFilePath(path);
         }
-
         @Override
-        public void setMusicIcon(String icon){
+        public void setMusicBitmap(Bitmap icon){
             MusicFileUtils.setMusic_ico(icon);
         }
     };
