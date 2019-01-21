@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -19,6 +20,7 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -35,6 +37,8 @@ public class MusicPlayerService extends Service{
     private static final String TAG = "MusicPlayerService";
 
 
+    private String SongName; //当前播放的歌曲名称
+    private String author; //当前播放的歌曲作者
     public IMusicAidlInterface.Stub musicConnection = new IMusicAidlInterface.Stub() {
         @Override
         public void openFile(String path) {
@@ -49,11 +53,13 @@ public class MusicPlayerService extends Service{
         @Override
         public void pause()  {
             multiPlayer.pause();
+            mNotificationManager.notify(MusicPlayerService.this.hashCode(),buildNotification(SongName,author));
         }
 
         @Override
         public void play() {
             multiPlayer.start();
+            mNotificationManager.notify(MusicPlayerService.this.hashCode(),buildNotification(SongName,author));
         }
 
         @Override
@@ -102,6 +108,8 @@ public class MusicPlayerService extends Service{
         @Override
         public void openFileSong(String path, String SongName, String author) {
             multiPlayer.setDataSource(path);
+            MusicPlayerService.this.SongName = SongName;
+            MusicPlayerService.this.author = author;
             mNotificationManager.notify(MusicPlayerService.this.hashCode(),buildNotification(SongName,author));
         }
 
@@ -120,7 +128,7 @@ public class MusicPlayerService extends Service{
     private int mServiceStartId = -1;
     public final RemoteCallbackList<IMusicPlayerAidlInterface> mCallbacks  = new RemoteCallbackList<IMusicPlayerAidlInterface>();
     private NotificationManager mNotificationManager;
-
+    private MediaSessionCompat mSession;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -133,6 +141,8 @@ public class MusicPlayerService extends Service{
         multiPlayer = new MultiPlayer(this,mCallbacks); //当player接收到播放状态相关的回调时,发送信息给handler处理
         manager = new AudioFocusManager(this);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            setUpMediaSession();
     }
     /**
      * 构建Notification
@@ -153,8 +163,8 @@ public class MusicPlayerService extends Service{
             name = "音乐服务正在运行";
             author = "";
         }
-        Intent intent = new Intent(MusicFileUtils.MESSAGECILCK);
-        PendingIntent broadcast = PendingIntent.getBroadcast(this,0,intent,0);
+        int playButtonResId = multiPlayer.isPlay()
+                ? R.drawable.ic_pause_white_36dp : R.drawable.ic_play_white_36dp;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,getPackageName())
                 //设置小图标
                 .setSmallIcon(R.drawable.ic_music_note_white_48dp)
@@ -165,13 +175,97 @@ public class MusicPlayerService extends Service{
                 .setContentText(author)
                 .setWhen(System.currentTimeMillis())
                 //设置点击通知事件
-                .setContentIntent(broadcast)
+                .setContentIntent(retrievePlaybackAction(MusicFileUtils.MESSAGECILCK))
+                .addAction(R.drawable.ic_previous_white_36dp,
+                        "",
+                        retrievePlaybackAction(MusicFileUtils.PREVIOUS))
+                .addAction(playButtonResId, "",
+                        retrievePlaybackAction(MusicFileUtils.PLAYORPAUSE))
+                .addAction(R.drawable.ic_next_white_36dp,
+                        "",
+                        retrievePlaybackAction(MusicFileUtils.NEXT))
                 .setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            android.support.v4.media.app.NotificationCompat.MediaStyle style = new android.support.v4.media.app.NotificationCompat.MediaStyle()
+                    .setMediaSession(mSession.getSessionToken())
+                    .setShowActionsInCompactView(0, 1, 2, 3);
+            builder.setStyle(style);
+        }
+
+        builder.setColor(Color.BLACK);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
             builder.setShowWhen(false);
         }
         //TODO 实现通知栏进行控制上一曲，下一曲功能 播放暂停功能。暂时不做
         return builder.build();
+    }
+    /**
+     * 点击了UI上的媒体按键,发送事件给MusicService
+     * @param action
+     * @return
+     */
+    private PendingIntent retrievePlaybackAction(final String action) {
+        Intent intent = new Intent(action);
+        PendingIntent broadcast = PendingIntent.getBroadcast(this,0,intent,0);
+        return broadcast;
+    }
+
+    /**
+     * 初始化和设置MediaSessionCompat
+     * MediaSessionCompat用于告诉系统及其他应用当前正在播放的内容,以及接收什么类型的播放控制
+     */
+    private void setUpMediaSession() {
+        mSession = new MediaSessionCompat(this, "music");
+        mSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public void onPause() {
+               multiPlayer.pause();
+            }
+
+            @Override
+            public void onPlay() {
+                multiPlayer.start();
+            }
+
+            @Override
+            public void onSeekTo(long pos) {
+                multiPlayer.seek(pos);
+            }
+
+            @Override
+            public void onSkipToNext() {
+                int count = mCallbacks.beginBroadcast();
+                for (int i = 0; i < count; i++) {
+                    try {
+                        mCallbacks.getBroadcastItem(i).onNext();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mCallbacks.finishBroadcast();
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                int count = mCallbacks.beginBroadcast();
+                for (int i = 0; i < count; i++) {
+                    try {
+                        mCallbacks.getBroadcastItem(i).onLast();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mCallbacks.finishBroadcast();
+            }
+
+            @Override
+            public void onStop() {
+                multiPlayer.pause();
+                multiPlayer.seek(0);
+            }
+        });
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
     }
 
     @Override
@@ -262,6 +356,7 @@ public class MusicPlayerService extends Service{
                         mCallbacks.finishBroadcast();
                     }
                     mIsInitialized = true;
+                    service.mNotificationManager.notify(service.hashCode(),service.buildNotification(service.SongName,service.author));
                 });
                 player.prepareAsync();
 
@@ -385,6 +480,7 @@ public class MusicPlayerService extends Service{
                 }
                 mCurrentMediaPlayer.start();
             }
+            service.mNotificationManager.notify(service.hashCode(),service.buildNotification(service.SongName,service.author));
         }
 
         public void release() {

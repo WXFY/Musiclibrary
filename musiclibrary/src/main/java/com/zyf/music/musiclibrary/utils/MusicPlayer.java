@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import android.util.Log;
 
 import com.zyf.music.musiclibrary.listener.OnProgressListener;
 import com.zyf.music.musiclibrary.model.SongName;
+import com.zyf.music.musiclibrary.receiver.MusicPlayBroadcastReceiver;
 import com.zyf.music.musiclibrary.service.IMusicAidlInterface;
 import com.zyf.music.musiclibrary.service.MusicPlayerService;
 
@@ -30,6 +32,7 @@ public class MusicPlayer {
     private static int pos = -1;
     private static int next = -1;
     private static WeakHashMap<Class,OnProgressListener> listeners;
+    private static MusicPlayBroadcastReceiver receiver;
     private static IMusicPlayerAidlInterface listener = new IMusicPlayerAidlInterface.Stub() {
         @Override
         public void bufferingProgress(int percent) {
@@ -108,6 +111,14 @@ public class MusicPlayer {
         if (contextWrapper.bindService(
                 new Intent().setClass(contextWrapper, MusicPlayerService.class), binder, 0)) {
             mConnectionMap.put(contextWrapper, binder);
+            if(receiver==null){
+                receiver = new MusicPlayBroadcastReceiver();
+                IntentFilter filter = new IntentFilter(MusicFileUtils.MESSAGECILCK);
+                filter.addAction(MusicFileUtils.NEXT);
+                filter.addAction(MusicFileUtils.PREVIOUS);
+                filter.addAction(MusicFileUtils.PLAYORPAUSE);
+                context.registerReceiver(receiver,filter);
+            }
             return new ServiceToken(contextWrapper);
         }
         return null;
@@ -126,15 +137,13 @@ public class MusicPlayer {
         pos = -1;
         next = -1;
         listeners.clear();
-        if(list!=null){
-            list.clear();
-            list = null;
-        }
+        if(list!=null)
         try {
             mService.unRegisterLoginUser(listener);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+        mContextWrapper.unregisterReceiver(receiver);
         mContextWrapper.unbindService(mBinder);
     }
 

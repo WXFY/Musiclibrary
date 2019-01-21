@@ -10,6 +10,9 @@ public class MusicFileUtils {
     private static String filePath = "music-cache";
     private static Bitmap music_ico;
     public static String MESSAGECILCK = "com.musicplayer.play";
+    public static String NEXT = "com.musicplayer.next";
+    public static String PREVIOUS = "com.musicplayer.previous";
+    public static String PLAYORPAUSE = "com.musicplayer.playorpause";
     public static void setFilePath(String filePath) {
         MusicFileUtils.filePath = filePath;
     }
