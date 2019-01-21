@@ -340,16 +340,6 @@ public class MusicPlayer {
                         openFile(((SongName)(list.get(pos))).SongPath());
                         playOrPause();
                         break;
-                    case LISTORDER:
-                        if(pos>=list.size()-1){
-                            seek(0);
-                            return;
-                        }else {
-                            pos++;
-                        }
-                        openFile(((SongName)(list.get(pos))).SongPath());
-                        playOrPause();
-                        break;
                 }
                 for (OnProgressListener value : listeners.values()) {
                     value.onCurrentSong(list.get(pos));
@@ -455,9 +445,6 @@ public class MusicPlayer {
     }
     public static void changeMode() {
         switch (mode){
-            case LISTORDER:
-                mode = PlaybackMode.LISTLOOP;
-                break;
             case LISTLOOP:
                 mode = PlaybackMode.RANDOM;
                 break;
@@ -465,7 +452,7 @@ public class MusicPlayer {
                 mode = PlaybackMode.SINGLESONG;
                 break;
             case SINGLESONG:
-                mode = PlaybackMode.LISTORDER;
+                mode = PlaybackMode.LISTLOOP;
                 break;
         }
     }

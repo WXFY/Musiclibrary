@@ -6,9 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.view.View;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView playAlbumIcon;
     ImageView clock;
     private ValueAnimator rotateAnimator;
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -252,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
             picker.show();
         });
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initSong(){
         if(MusicPlayer.isPlaying()){
             rotateAnimator.resume();
@@ -313,9 +317,6 @@ public class MainActivity extends AppCompatActivity {
                 modeRes = R.mipmap.random_icon;
                 break;
             case LISTLOOP:
-                modeRes = R.mipmap.list_loop_icon;
-                break;
-            case LISTORDER:
                 modeRes = R.mipmap.list_loop_icon;
                 break;
         }
