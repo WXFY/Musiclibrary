@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.zyf.music.musiclibrary.listener.OnProgressListener;
 import com.zyf.music.musiclibrary.model.SongName;
@@ -28,7 +27,7 @@ public class MusicPlayer {
     public static IMusicAidlInterface mService = null;
     private static PlaybackMode mode = PlaybackMode.LISTLOOP;
     private static final WeakHashMap<Context, ServiceBinder> mConnectionMap;
-    private static List<?> list;
+    private static List<? extends SongName> list;
     private static int pos = -1;
     private static int next = -1;
     private static WeakHashMap<Class,OnProgressListener> listeners;
@@ -93,7 +92,7 @@ public class MusicPlayer {
     };
 
     static {
-        mConnectionMap = new WeakHashMap<Context, ServiceBinder>();
+        mConnectionMap = new WeakHashMap<>();
         listeners = new WeakHashMap<>();
     }
 
@@ -197,6 +196,9 @@ public class MusicPlayer {
         listeners.remove(clazz);
     }
     public static void playOrPause() {
+        if(list==null){
+            return;
+        }
         try {
             if (mService != null) {
                 if (mService.isPlaying()) {
@@ -215,6 +217,9 @@ public class MusicPlayer {
      * 下一首
      * */
     public static void next() {
+        if(list==null){
+            return;
+        }
         switch (mode){
             case RANDOM:
                 pos = (int)(Math.random()*(list.size()-1));
@@ -237,6 +242,9 @@ public class MusicPlayer {
      * 上一首
      * */
     public static void previous() {
+        if(list==null){
+            return;
+        }
         switch (mode){
             case RANDOM:
                 pos = (int)(Math.random()*(list.size()-1));
@@ -369,7 +377,7 @@ public class MusicPlayer {
         }
     }
 
-    public static List<?> getList() {
+    public static List<? extends SongName> getList() {
         return list;
     }
 
@@ -465,7 +473,7 @@ public class MusicPlayer {
                 break;
         }
     }
-    public static void setList(List<?> list, int current) {
+    public static void setList(List<? extends SongName> list, int current) {
         MusicPlayer.list = list;
         pos = current;
         if(mService!=null){
