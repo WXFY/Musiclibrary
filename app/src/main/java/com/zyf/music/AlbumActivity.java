@@ -84,7 +84,7 @@ public class AlbumActivity extends AppCompatActivity {
         data.add(song3);
 
         Song song4 = new Song(); //远走高飞
-        song4.setPath("http://sc1.111ttt.cn/2017/1/05/09/298092036393.mp3");
+        song4.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112003137.mp3");
         song4.setName("远走高飞");
         song4.setAuthor("金志文");
         song4.setTime("03:55");
@@ -117,14 +117,14 @@ public class AlbumActivity extends AppCompatActivity {
         data.add(song7);
 
         Song song8 = new Song();
-        song8.setPath("http://sc1.111ttt.cn/2017/1/05/09/298092041338.mp3");
-        song8.setName("我不相信");
-        song8.setAuthor("庄心妍");
+        song8.setPath("http://www.ytmp3.cn/down/59213.mp3");
+        song8.setName("平凡之路");
+        song8.setAuthor("沈腾");
         song8.setLrc("暂无歌词");
-        song8.setTime("04:24");
+        song8.setTime("03:08");
         data.add(song8);
         recycler.setAdapter(adapter = new SongListAdapter(data));
-        MusicPlayer.setMusicIcon(BitmapFactory.decodeResource(getResources(), R.drawable.lrc_play));
+        MusicPlayer.setMusicIcon(BitmapFactory.decodeResource(getResources(), R.drawable.icon));
         adapter.setOnItemClickListener((adapter, view, position) -> {
             Intent intent = new Intent(AlbumActivity.this,MainActivity.class);
             if(MusicPlayer.isPlaying()&&MusicPlayer.getPos()==position){

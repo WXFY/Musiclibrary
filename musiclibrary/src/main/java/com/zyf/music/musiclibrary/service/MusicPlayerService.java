@@ -152,11 +152,13 @@ public class MusicPlayerService extends Service{
         NotificationChannel notificationChannel = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notificationChannel = new NotificationChannel(getPackageName(),
-                    "music", NotificationManager.IMPORTANCE_HIGH);
+                    "music", NotificationManager.IMPORTANCE_LOW);
             notificationChannel.enableLights(false);
             notificationChannel.enableVibration(false);
             notificationChannel.setVibrationPattern(new long[]{0});
             notificationChannel.setSound(null, null);
+            notificationChannel.setShowBadge(false);
+            notificationChannel.setDescription("app后台播放音乐模块");
             mNotificationManager.createNotificationChannel(notificationChannel);
         }
         if(TextUtils.isEmpty(name)){
