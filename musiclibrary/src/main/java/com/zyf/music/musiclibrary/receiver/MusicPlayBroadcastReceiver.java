@@ -13,11 +13,14 @@ public class MusicPlayBroadcastReceiver extends BroadcastReceiver {
        if(MusicFileUtils.NEXT.equals(intent.getAction())){
            MusicPlayer.next();
        }
-        if(MusicFileUtils.PREVIOUS.equals(intent.getAction())){
-            MusicPlayer.previous();
-        }
-        if(MusicFileUtils.PLAYORPAUSE.equals(intent.getAction())){
-            MusicPlayer.playOrPause();
+       if(MusicFileUtils.PREVIOUS.equals(intent.getAction())){
+           MusicPlayer.previous();
+       }
+       if(MusicFileUtils.PLAYORPAUSE.equals(intent.getAction())){
+           MusicPlayer.playOrPause();
+       }
+        if(MusicFileUtils.PLAYOCLOSE.equals(intent.getAction())){
+            MusicPlayer.playClose();
         }
     }
 }

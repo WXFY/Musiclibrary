@@ -13,6 +13,7 @@ public class MusicFileUtils {
     public static String NEXT = "com.musicplayer.next";
     public static String PREVIOUS = "com.musicplayer.previous";
     public static String PLAYORPAUSE = "com.musicplayer.playorpause";
+    public static String PLAYOCLOSE = "com.musicplayer.playoclose";
     public static void setFilePath(String filePath) {
         MusicFileUtils.filePath = filePath;
     }

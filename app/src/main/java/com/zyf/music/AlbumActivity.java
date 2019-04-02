@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,14 +34,14 @@ public class AlbumActivity extends AppCompatActivity {
     private LinearLayout topBg;
     private TextView title;
     private SongListAdapter adapter;
-    MusicPlayer.ServiceToken token;
+
 
     private MusicBroadcastReceiver broadcastReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
-        token = MusicPlayer.bindToService(this,null);
+        MusicPlayer.bindToService(this,null);
         topImage = findViewById(R.id.top_image);
         albumImage = findViewById(R.id.album_image);
         recycler = findViewById(R.id.recycler);
@@ -51,7 +51,12 @@ public class AlbumActivity extends AppCompatActivity {
         title.setTextColor(0xFFFFFFFF);
         title.setText("页面名称");
         recycler.setLayoutManager(new LinearLayoutManager(this));
-
+        albumImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MusicPlayer.unbindFromService();
+            }
+        });
         broadcastReceiver = new MusicBroadcastReceiver();
         IntentFilter filter = new IntentFilter(MusicFileUtils.MESSAGECILCK);
         registerReceiver(broadcastReceiver, filter);
@@ -197,8 +202,7 @@ public class AlbumActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MusicPlayer.unbindFromService(token);
-        token = null;
+        MusicPlayer.unbindFromService();
         android.os.Process.killProcess(android.os.Process.myPid());
         unregisterReceiver(broadcastReceiver);
     }

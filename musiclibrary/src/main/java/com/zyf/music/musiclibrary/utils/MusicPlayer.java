@@ -32,6 +32,10 @@ public class MusicPlayer {
     private static int next = -1;
     private static WeakHashMap<Class,OnProgressListener> listeners;
     private static MusicPlayBroadcastReceiver receiver;
+    private static ServiceToken token;
+    private static Context context;
+
+    private static boolean play = false; //播放标记位
     private static IMusicPlayerAidlInterface listener = new IMusicPlayerAidlInterface.Stub() {
         @Override
         public void bufferingProgress(int percent) {
@@ -96,9 +100,9 @@ public class MusicPlayer {
         listeners = new WeakHashMap<>();
     }
 
-    public static ServiceToken bindToService(final Context context,
+    public static void bindToService(final Context context,
                                              final ServiceConnection callback) {
-
+        MusicPlayer.context = context;
         Activity realActivity = ((Activity) context).getParent();
         if (realActivity == null) {
             realActivity = (Activity) context;
@@ -116,14 +120,16 @@ public class MusicPlayer {
                 filter.addAction(MusicFileUtils.NEXT);
                 filter.addAction(MusicFileUtils.PREVIOUS);
                 filter.addAction(MusicFileUtils.PLAYORPAUSE);
+                filter.addAction(MusicFileUtils.PLAYOCLOSE);
                 context.registerReceiver(receiver,filter);
             }
-            return new ServiceToken(contextWrapper);
+            token = new ServiceToken(contextWrapper);
+            return;
         }
-        return null;
+        return;
     }
 
-    public static void unbindFromService(final ServiceToken token) {
+    public static void unbindFromService() {
         if (token == null) {
             return;
         }
@@ -144,6 +150,9 @@ public class MusicPlayer {
         }
         mContextWrapper.unregisterReceiver(receiver);
         mContextWrapper.unbindService(mBinder);
+        token = null;
+        mService = null;
+        receiver = null;
     }
 
     public static final class ServiceBinder implements ServiceConnection {
@@ -164,6 +173,13 @@ public class MusicPlayer {
                 mService.setMusicBitmap(MusicFileUtils.getMusic_ico(mContext));
                 mService.setFilePath(MusicFileUtils.getFilePath());
                 readyMusic();
+                if(play){
+                    mService.play();
+                    for (OnProgressListener value : listeners.values()) {
+                        value.onStart();
+                    }
+                    play = false;
+                }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -183,6 +199,9 @@ public class MusicPlayer {
 
     private static void readyMusic() {
         if(list!=null&&list.size()>pos) {
+            if(mService==null){
+                bindToService(context,null);
+            }
             openFile(((SongName) (list.get(pos))).SongPath());
         }
     }
@@ -198,6 +217,10 @@ public class MusicPlayer {
     public static void playOrPause() {
         if(list==null){
             return;
+        }
+        if(mService==null){
+            play = true;
+            bindToService(context,null);
         }
         try {
             if (mService != null) {
@@ -492,5 +515,7 @@ public class MusicPlayer {
         } catch (Exception ignored) {
         }
     }
-
+    public static void playClose() {
+        unbindFromService();
+    }
 }
