@@ -139,9 +139,6 @@ public class MusicPlayer {
             return;
         }
         handler.removeMessages(0);
-        pos = -1;
-        next = -1;
-        listeners.clear();
         if(list!=null)
         try {
             mService.unRegisterLoginUser(listener);
@@ -153,6 +150,9 @@ public class MusicPlayer {
         token = null;
         mService = null;
         receiver = null;
+        for (OnProgressListener value : listeners.values()) {
+            value.onStart();
+        }
     }
 
     public static final class ServiceBinder implements ServiceConnection {
@@ -177,6 +177,7 @@ public class MusicPlayer {
                     mService.play();
                     for (OnProgressListener value : listeners.values()) {
                         value.onStart();
+                        handler.sendEmptyMessage(0);
                     }
                     play = false;
                 }
@@ -194,6 +195,9 @@ public class MusicPlayer {
                 mCallback.onServiceDisconnected(className);
             }
             mService = null;
+            for (OnProgressListener value : listeners.values()) {
+                value.onStart();
+            }
         }
     }
 

@@ -186,12 +186,15 @@ public class MusicPlayerService extends Service{
                 .addAction(R.drawable.ic_next_white_36dp,
                         "",
                         retrievePlaybackAction(MusicFileUtils.NEXT))
+                .addAction(R.drawable.ic_close_white_36dp,
+                        "",
+                        retrievePlaybackAction(MusicFileUtils.PLAYOCLOSE))
                 .setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             android.support.v4.media.app.NotificationCompat.MediaStyle style = new android.support.v4.media.app.NotificationCompat.MediaStyle()
                     .setMediaSession(mSession.getSessionToken())
-                    .setShowActionsInCompactView(0, 1, 2, 3);
+                    .setShowActionsInCompactView(0, 1, 2, 3, 4);
             builder.setStyle(style);
         }
 

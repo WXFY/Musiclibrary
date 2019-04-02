@@ -51,12 +51,6 @@ public class AlbumActivity extends AppCompatActivity {
         title.setTextColor(0xFFFFFFFF);
         title.setText("页面名称");
         recycler.setLayoutManager(new LinearLayoutManager(this));
-        albumImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MusicPlayer.unbindFromService();
-            }
-        });
         broadcastReceiver = new MusicBroadcastReceiver();
         IntentFilter filter = new IntentFilter(MusicFileUtils.MESSAGECILCK);
         registerReceiver(broadcastReceiver, filter);
