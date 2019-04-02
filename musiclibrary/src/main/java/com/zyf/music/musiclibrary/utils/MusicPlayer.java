@@ -19,6 +19,7 @@ import com.zyf.music.musiclibrary.receiver.MusicPlayBroadcastReceiver;
 import com.zyf.music.musiclibrary.service.IMusicAidlInterface;
 import com.zyf.music.musiclibrary.service.MusicPlayerService;
 
+
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -206,7 +207,7 @@ public class MusicPlayer {
             if(mService==null){
                 bindToService(context,null);
             }
-            openFile(((SongName) (list.get(pos))).SongPath());
+            openFile(((list.get(pos))).SongPath());
         }
     }
 
@@ -215,9 +216,15 @@ public class MusicPlayer {
         handler.removeMessages(0);
         handler.sendEmptyMessage(0);
     }
+    /**
+     * 页面取消播放状态和播放监听
+     * */
     public static void  removeListener(Class clazz) {
         listeners.remove(clazz);
     }
+    /**
+     * 播放/暂停
+     * */
     public static void playOrPause() {
         if(list==null){
             return;
@@ -368,7 +375,7 @@ public class MusicPlayer {
                 switch (mode){
                     case RANDOM:
                         pos = (int)(Math.random()*(list.size()-1));
-                        openFile(((SongName)(list.get(pos))).SongPath());
+                        openFile(((list.get(pos))).SongPath());
                         playOrPause();
                         break;
                     case LISTLOOP:
@@ -377,11 +384,11 @@ public class MusicPlayer {
                         }else {
                             pos++;
                         }
-                        openFile(((SongName)(list.get(pos))).SongPath());
+                        openFile(((list.get(pos))).SongPath());
                         playOrPause();
                         break;
                     case SINGLESONG:
-                        openFile(((SongName)(list.get(pos))).SongPath());
+                        openFile(((list.get(pos))).SongPath());
                         playOrPause();
                         break;
                 }
@@ -407,7 +414,6 @@ public class MusicPlayer {
     public static List<? extends SongName> getList() {
         return list;
     }
-
     public static int getPos() {
         return pos;
     }
