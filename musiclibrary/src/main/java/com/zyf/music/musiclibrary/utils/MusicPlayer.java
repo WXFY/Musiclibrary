@@ -107,11 +107,7 @@ public class MusicPlayer {
     public static void bindToService(final Context context,
                                              final ServiceConnection callback) {
         MusicPlayer.context = context;
-        Activity realActivity = ((Activity) context).getParent();
-        if (realActivity == null) {
-            realActivity = (Activity) context;
-        }
-        final ContextWrapper contextWrapper = new ContextWrapper(realActivity);
+        final ContextWrapper contextWrapper = new ContextWrapper(context);
         contextWrapper.startService(new Intent(contextWrapper, MusicPlayerService.class));
         final ServiceBinder binder = new ServiceBinder(callback,
                 contextWrapper.getApplicationContext());
