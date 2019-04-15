@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -41,7 +40,7 @@ public class AlbumActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
-        MusicPlayer.bindToService(this,null);
+        MusicPlayer.init(this);
         topImage = findViewById(R.id.top_image);
         albumImage = findViewById(R.id.album_image);
         recycler = findViewById(R.id.recycler);
@@ -57,16 +56,16 @@ public class AlbumActivity extends AppCompatActivity {
 
         List<Song> data = new ArrayList<>();
         Song song1 = new Song(); //最美情侣
-        song1.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112002239.mp3");
+        song1.setPath("http://www.ytmp3.cn/down/50021.mp3");
         song1.setName("最美情侣");
         song1.setAuthor("白小白");
-        song1.setTime("04:01");
+        song1.setTime("04:49");
         song1.setLrc(getResources().getString(R.string.song1));
         data.add(song1);
 
 
         Song song2 = new Song(); //红昭愿
-        song2.setPath("http://sc1.111ttt.cn/2018/1/03/13/396131227447.mp3");
+        song2.setPath("http://www.ytmp3.cn/down/57804.mp3");
         song2.setName("红昭愿");
         song2.setAuthor("未知歌手");
         song2.setTime("02:53");
@@ -75,7 +74,7 @@ public class AlbumActivity extends AppCompatActivity {
 
 
         Song song3 = new Song(); //追光者
-        song3.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112002347.mp3");
+        song3.setPath("http://www.ytmp3.cn/down/46128.mp3");
         song3.setName("追光者");
         song3.setAuthor("岑宁儿");
         song3.setTime("03:55");
@@ -83,7 +82,7 @@ public class AlbumActivity extends AppCompatActivity {
         data.add(song3);
 
         Song song4 = new Song(); //远走高飞
-        song4.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112003137.mp3");
+        song4.setPath("http://www.ytmp3.cn/down/47422.mp3");
         song4.setName("远走高飞");
         song4.setAuthor("金志文");
         song4.setTime("03:55");
@@ -91,7 +90,7 @@ public class AlbumActivity extends AppCompatActivity {
         data.add(song4);
 
         Song song5 = new Song(); //带你去旅行
-        song5.setPath("http://sc1.111ttt.cn/2017/1/11/11/304112004168.mp3");
+        song5.setPath("http://www.ytmp3.cn/down/43135.mp3");
         song5.setName("带你去旅行");
         song5.setAuthor("校长");
         song5.setTime("03:45");
@@ -100,7 +99,7 @@ public class AlbumActivity extends AppCompatActivity {
 
 
         Song song6 = new Song(); //9420
-        song6.setPath("http://sc1.111ttt.cn/2018/1/03/13/396131225385.mp3");
+        song6.setPath("http://www.ytmp3.cn/down/50171.mp3");
         song6.setName("9420");
         song6.setAuthor("麦小兜");
         song6.setLrc("暂无歌词");
@@ -116,9 +115,9 @@ public class AlbumActivity extends AppCompatActivity {
         data.add(song7);
 
         Song song8 = new Song();
-        song8.setPath("http://www.ytmp3.cn/down/59213.mp3");
+        song8.setPath("http://www.ytmp3.cn/down/46793.mp3");
         song8.setName("平凡之路");
-        song8.setAuthor("沈腾");
+        song8.setAuthor("许巍");
         song8.setLrc("暂无歌词");
         song8.setTime("03:08");
         data.add(song8);

@@ -100,6 +100,9 @@ public class MusicPlayer {
         mConnectionMap = new WeakHashMap<>();
         listeners = new WeakHashMap<>();
     }
+    public static void init(Context context){
+        MusicPlayer.context = context;
+    }
 
     public static void bindToService(final Context context,
                                              final ServiceConnection callback) {
