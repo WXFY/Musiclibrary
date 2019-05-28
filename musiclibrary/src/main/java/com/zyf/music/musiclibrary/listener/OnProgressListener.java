@@ -7,4 +7,5 @@ public interface OnProgressListener {
     void onCurrentSong(Object song);
     void onError();
     void onStart();
+    void playerId(int mediaPlayerId);
 }

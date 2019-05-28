@@ -27,4 +27,8 @@ interface IMusicPlayerAidlInterface {
     * 同上
     * */
    void onLast();
+    /**
+      * 播放器id
+      * */
+    void playerId(in int mediaPlayerId);
 }

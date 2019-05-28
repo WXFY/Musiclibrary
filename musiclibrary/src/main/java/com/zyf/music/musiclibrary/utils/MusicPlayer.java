@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.zyf.music.musiclibrary.listener.OnProgressListener;
 import com.zyf.music.musiclibrary.model.SongName;
@@ -79,6 +80,12 @@ public class MusicPlayer {
         @Override
         public void onLast() {
 
+        }
+        @Override
+        public void playerId(int mediaPlayerId) {
+            for (OnProgressListener value : listeners.values()) {
+                value.playerId(mediaPlayerId);
+            }
         }
     };
     private static Handler handler = new Handler(){

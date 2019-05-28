@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.zyf.music"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -31,4 +31,5 @@ dependencies {
     //图片加载
     implementation 'jp.wasabeef:glide-transformations:4.0.1'
     //implementation 'com.github.WXFY:Musiclibrary:V1.0'
+    implementation 'com.github.bogerchan:Nier-Visualizer:v0.1.3'
 }

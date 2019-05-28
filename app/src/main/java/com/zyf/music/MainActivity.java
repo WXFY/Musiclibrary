@@ -5,14 +5,16 @@ import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
@@ -35,8 +37,12 @@ import com.zyf.music.widget.SongSelectorPicker;
 
 import java.io.File;
 import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.List;
+
+import me.bogerchan.niervisualizer.NierVisualizerManager;
+import me.bogerchan.niervisualizer.renderer.IRenderer;
+import me.bogerchan.niervisualizer.renderer.circle.CircleBarRenderer;
+import me.bogerchan.niervisualizer.util.NierAnimator;
 
 import static com.zyf.music.utils.ClockSongUtils.isClock;
 
@@ -56,13 +62,22 @@ public class MainActivity extends AppCompatActivity {
     ImageView playIcon;
     ImageView playAlbumIcon;
     ImageView clock;
+
+    SurfaceView sv_wave;
+
+    int mediaPlayerId;
     private ValueAnimator rotateAnimator;
+    final NierVisualizerManager visualizerManager = new NierVisualizerManager();
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         playIcon = findViewById(R.id.play);
+        sv_wave = findViewById(R.id.sv_wave);
+        sv_wave. setZOrderOnTop(true);
+        sv_wave.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         playIcon.setOnClickListener((v)->{
             MusicPlayer.playOrPause();
             if(MusicPlayer.isPlaying()){
@@ -234,6 +249,21 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+            @Override
+            public void playerId(int playerId) {
+                mediaPlayerId = playerId;
+                final int state = visualizerManager.init(playerId);
+                if (NierVisualizerManager.SUCCESS != state) {
+                    // do something...
+                    Paint paint = new Paint();
+                    paint.setAntiAlias(true);
+                    paint.setStrokeWidth(10f);
+                    paint.setColor(Color.parseColor("#FEAEC9"));
+
+                    visualizerManager.start(sv_wave, new IRenderer[]{new CircleBarRenderer(paint,4, CircleBarRenderer.Type.TYPE_A,
+                            0.4f,1f,new NierAnimator(new LinearInterpolator(),10000,new float[]{0f,360f},true))});
+                }
+            }
         });
         findViewById(R.id.list_song).setOnClickListener(v->{
             SongSelectorPicker picker = new SongSelectorPicker(MainActivity.this,(pos)->{
@@ -343,5 +373,24 @@ public class MainActivity extends AppCompatActivity {
             rotateAnimator.cancel();
             playAlbumIcon.clearAnimation();
         }
+        visualizerManager.release();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        visualizerManager.stop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        visualizerManager.pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        visualizerManager.resume();
     }
 }

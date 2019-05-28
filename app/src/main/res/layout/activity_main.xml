@@ -20,12 +20,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"/>
-            <ImageView
-                android:id="@+id/play_icon"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_centerInParent="true"
-                android:src="@mipmap/default_music_icon" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <SurfaceView
+                    android:id="@+id/sv_wave"
+                    android:layout_centerInParent="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:layout_margin="10dp" />
+                <ImageView
+                    android:id="@+id/play_icon"
+                    android:layout_width="228dp"
+                    android:layout_height="228dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/default_music_icon" />
+            </RelativeLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -44,6 +55,7 @@
                     app:lrcTimeTextColor="#BDBDBD"
                     app:lrcTimelineColor="#80BDBDBD"
                     app:lrcTimelineTextColor="#9FA8DA"/>
+
             </RelativeLayout>
 
         </LinearLayout>

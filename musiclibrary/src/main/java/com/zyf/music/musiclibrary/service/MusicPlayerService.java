@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.Visualizer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -202,7 +203,6 @@ public class MusicPlayerService extends Service{
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
             builder.setShowWhen(false);
         }
-        //TODO 实现通知栏进行控制上一曲，下一曲功能 播放暂停功能。暂时不做
         return builder.build();
     }
     /**
@@ -306,6 +306,7 @@ public class MusicPlayerService extends Service{
         private MediaPlayer mNextMediaPlayer;
         private MusicPlayerService service;
         RemoteCallbackList<IMusicPlayerAidlInterface> mCallbacks;
+
         private HttpProxyCacheServer proxy;
         private int buffer = 0;
         private boolean isPlay = false;
@@ -362,6 +363,20 @@ public class MusicPlayerService extends Service{
                     }
                     mIsInitialized = true;
                     service.mNotificationManager.notify(service.hashCode(),service.buildNotification(service.SongName,service.author));
+                    try {
+                        int mediaPlayerId = mCurrentMediaPlayer.getAudioSessionId();
+                        int count = mCallbacks.beginBroadcast();
+                        for (int i = 0; i < count; i++) {
+                            try {
+                                mCallbacks.getBroadcastItem(i).playerId(mediaPlayerId);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        mCallbacks.finishBroadcast();
+                    }catch (Exception e){
+                        Log.e(TAG, "请检查录音权限");
+                    }
                 });
                 player.prepareAsync();
 

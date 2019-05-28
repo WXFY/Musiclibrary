@@ -165,6 +165,10 @@ public class AlbumActivity extends AppCompatActivity {
             public void onStart() {
 
             }
+            @Override
+            public void playerId(int mediaPlayerId) {
+
+            }
         });
         Glide.with(this).load(R.mipmap.default_music_icon).apply(RequestOptions.bitmapTransform(new BlurTransformation(4, 15))).into(topImage);
        /* Glide.with(this).load(R.mipmap.default_music_icon).bitmapTransform(new BlurTransformation(this, 15)).into(topImage);*/
