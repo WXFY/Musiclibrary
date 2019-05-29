@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     SurfaceView sv_wave;
 
-    int mediaPlayerId;
+    static int mediaPlayerId = 0;
     private ValueAnimator rotateAnimator;
     final NierVisualizerManager visualizerManager = new NierVisualizerManager();
 
@@ -165,12 +165,14 @@ public class MainActivity extends AppCompatActivity {
                 lrc.setVisibility(View.VISIBLE);
                 lrcFull.setVisibility(View.INVISIBLE);
                 playAlbumIcon.setVisibility(View.VISIBLE);
+                sv_wave.setVisibility(View.VISIBLE);
             }
         });
         lrc.setOnTouchListener((v, event) -> {
             lrc.setVisibility(View.INVISIBLE);
             lrcFull.setVisibility(View.VISIBLE);
             playAlbumIcon.setVisibility(View.INVISIBLE);
+            sv_wave.setVisibility(View.INVISIBLE);
             return false;
         });
         boolean play = getIntent().getBooleanExtra("play",false);
@@ -252,17 +254,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void playerId(int playerId) {
                 mediaPlayerId = playerId;
-                final int state = visualizerManager.init(playerId);
-                if (NierVisualizerManager.SUCCESS != state) {
-                    // do something...
-                    Paint paint = new Paint();
-                    paint.setAntiAlias(true);
-                    paint.setStrokeWidth(10f);
-                    paint.setColor(Color.parseColor("#FEAEC9"));
-
-                    visualizerManager.start(sv_wave, new IRenderer[]{new CircleBarRenderer(paint,4, CircleBarRenderer.Type.TYPE_A,
-                            0.4f,1f,new NierAnimator(new LinearInterpolator(),10000,new float[]{0f,360f},true))});
-                }
+                initVisualizer();
             }
         });
         findViewById(R.id.list_song).setOnClickListener(v->{
@@ -284,14 +276,38 @@ public class MainActivity extends AppCompatActivity {
             });
             picker.show();
         });
+
+        initVisualizer();
     }
+    /**
+     * 加载频谱
+     * */
+    private void initVisualizer() {
+        if(mediaPlayerId==0){
+            return;
+        }
+        final int state = visualizerManager.init(mediaPlayerId);
+        if (NierVisualizerManager.SUCCESS == state) {
+            // do something...
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setStrokeWidth(10f);
+            paint.setColor(Color.parseColor("#FEAEC9"));
+
+            visualizerManager.start(sv_wave, new IRenderer[]{new CircleBarRenderer(paint,4, CircleBarRenderer.Type.TYPE_A,
+                    0.4f,1f,new NierAnimator(new LinearInterpolator(),100,new float[]{0f,1f},false))});
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initSong(){
         if(MusicPlayer.isPlaying()){
             rotateAnimator.resume();
             playIcon.setImageResource(R.mipmap.pause_icon);
+            visualizerManager.resume();
         }else {
             rotateAnimator.pause();
+            visualizerManager.pause();
             playIcon.setImageResource(R.mipmap.play_icon);
         }
         if(!isClock){
