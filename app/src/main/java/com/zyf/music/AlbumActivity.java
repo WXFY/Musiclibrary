@@ -65,10 +65,10 @@ public class AlbumActivity extends AppCompatActivity {
 
 
         Song song2 = new Song(); //红昭愿
-        song2.setPath("http://www.ytmp3.cn/down/57804.mp3");
-        song2.setName("红昭愿");
+        song2.setPath("http://mul1.waptx.com/music/group/bbs/mp3/68/080815/1218799774417.mp3");
+        song2.setName("凤舞九天");
         song2.setAuthor("未知歌手");
-        song2.setTime("02:53");
+        song2.setTime("03:23");
         song2.setLrc(getResources().getString(R.string.song2));
         data.add(song2);
 

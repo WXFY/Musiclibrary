@@ -33,6 +33,7 @@ import com.zyf.music.musiclibrary.utils.MusicPlayer;
 import com.zyf.music.musiclibrary.utils.PlaybackMode;
 import com.zyf.music.widget.ClockSelectorPicker;
 import com.zyf.music.widget.LrcView;
+import com.zyf.music.widget.MyCircleBarRenderer;
 import com.zyf.music.widget.SongSelectorPicker;
 
 import java.io.File;
@@ -41,7 +42,7 @@ import java.util.List;
 
 import me.bogerchan.niervisualizer.NierVisualizerManager;
 import me.bogerchan.niervisualizer.renderer.IRenderer;
-import me.bogerchan.niervisualizer.renderer.circle.CircleBarRenderer;
+import me.bogerchan.niervisualizer.renderer.circle.CircleSolidRenderer;
 import me.bogerchan.niervisualizer.util.NierAnimator;
 
 import static com.zyf.music.utils.ClockSongUtils.isClock;
@@ -76,23 +77,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         playIcon = findViewById(R.id.play);
         sv_wave = findViewById(R.id.sv_wave);
-        sv_wave. setZOrderOnTop(true);
+        sv_wave.setZOrderOnTop(true);
         sv_wave.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        playIcon.setOnClickListener((v)->{
+        playIcon.setOnClickListener((v) -> {
             MusicPlayer.playOrPause();
-            if(MusicPlayer.isPlaying()){
+            if (MusicPlayer.isPlaying()) {
                 rotateAnimator.resume();
                 playIcon.setImageResource(R.mipmap.pause_icon);
-            }else {
+            } else {
                 rotateAnimator.pause();
                 playIcon.setImageResource(R.mipmap.play_icon);
             }
         });
-        findViewById(R.id.last).setOnClickListener((v)->{
+        findViewById(R.id.last).setOnClickListener((v) -> {
             MusicPlayer.previous();
             resetTime();
         });
-        findViewById(R.id.next).setOnClickListener((v)->{
+        findViewById(R.id.next).setOnClickListener((v) -> {
             MusicPlayer.next();
             resetTime();
         });
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
-                        if(toTransform == null){
+                        if (toTransform == null) {
                             return null;
                         }
                         int size = Math.min(toTransform.getWidth(), toTransform.getHeight());
@@ -175,8 +176,8 @@ public class MainActivity extends AppCompatActivity {
             sv_wave.setVisibility(View.INVISIBLE);
             return false;
         });
-        boolean play = getIntent().getBooleanExtra("play",false);
-        if(play){
+        boolean play = getIntent().getBooleanExtra("play", false);
+        if (play) {
             MusicPlayer.playOrPause();
         }
         openAnimation();
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     MusicPlayer.seek(progress);
                 }
             }
@@ -208,8 +209,8 @@ public class MainActivity extends AppCompatActivity {
         MusicPlayer.setListener(this.getClass(), new OnProgressListener() {
             @Override
             public void onLongProgress(long duration, long current) {
-                seekbar.setMax((int)duration);
-                seekbar.setProgress((int)current);
+                seekbar.setMax((int) duration);
+                seekbar.setProgress((int) current);
                 lrc.updateTime(current);
                 lrcFull.updateTime(current);
             }
@@ -227,22 +228,22 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCurrentSong(Object song) {
-                if(song!=null&&song instanceof Song){
-                    showLyric(((Song)song).getLrc());
-                    title.setText(((Song)song).getName());
+                if (song != null && song instanceof Song) {
+                    showLyric(((Song) song).getLrc());
+                    title.setText(((Song) song).getName());
                 }
             }
 
             @Override
             public void onError() {
-                runOnUiThread(()->{
-                    Toast.makeText(MainActivity.this,"歌曲加载失败",Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "歌曲加载失败", Toast.LENGTH_SHORT).show();
                 });
             }
 
             @Override
             public void onStart() {
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     try {
                         Thread.sleep(50);
                         initSong();
@@ -251,26 +252,27 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
             @Override
             public void playerId(int playerId) {
                 mediaPlayerId = playerId;
                 initVisualizer();
             }
         });
-        findViewById(R.id.list_song).setOnClickListener(v->{
-            SongSelectorPicker picker = new SongSelectorPicker(MainActivity.this,(pos)->{
-                MusicPlayer.setList(MusicPlayer.getList(),pos);
+        findViewById(R.id.list_song).setOnClickListener(v -> {
+            SongSelectorPicker picker = new SongSelectorPicker(MainActivity.this, (pos) -> {
+                MusicPlayer.setList(MusicPlayer.getList(), pos);
                 MusicPlayer.playOrPause();
                 initSong();
                 resetTime();
-            },(List<Song>) (MusicPlayer.getList()));
+            }, (List<Song>) (MusicPlayer.getList()));
             picker.show();
         });
-        clock.setOnClickListener(v->{
-            ClockSelectorPicker picker = new ClockSelectorPicker(MainActivity.this,(pos)->{
-                if(!pos){
+        clock.setOnClickListener(v -> {
+            ClockSelectorPicker picker = new ClockSelectorPicker(MainActivity.this, (pos) -> {
+                if (!pos) {
                     clock.setImageResource(R.mipmap.timing_icon);
-                }else {
+                } else {
                     clock.setImageResource(R.mipmap.timing_select_icon);
                 }
             });
@@ -279,11 +281,12 @@ public class MainActivity extends AppCompatActivity {
 
         initVisualizer();
     }
+
     /**
      * 加载频谱
-     * */
+     */
     private void initVisualizer() {
-        if(mediaPlayerId==0){
+        if (mediaPlayerId == 0) {
             return;
         }
         final int state = visualizerManager.init(mediaPlayerId);
@@ -291,42 +294,49 @@ public class MainActivity extends AppCompatActivity {
             // do something...
             Paint paint = new Paint();
             paint.setAntiAlias(true);
-            paint.setStrokeWidth(10f);
+            paint.setStrokeWidth(5f);
+            paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setColor(Color.parseColor("#FEAEC9"));
 
-            visualizerManager.start(sv_wave, new IRenderer[]{new CircleBarRenderer(paint,4, CircleBarRenderer.Type.TYPE_A,
-                    0.4f,1f,new NierAnimator(new LinearInterpolator(),100,new float[]{0f,1f},false))});
+            Paint paint1 = new Paint();
+            paint1.setAntiAlias(true);
+            paint1.setStrokeWidth(1f);
+            paint1.setColor(Color.parseColor("#FF4081"));
+            visualizerManager.start(sv_wave, new IRenderer[]{new MyCircleBarRenderer(paint, 4, MyCircleBarRenderer.Type.TYPE_A,
+                    0.3f, 2f, new NierAnimator(new LinearInterpolator(), 100, new float[]{0f, -90f}, false),true),
+                    new CircleSolidRenderer(paint1, 0.2f)
+            });
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void initSong(){
-        if(MusicPlayer.isPlaying()){
+    private void initSong() {
+        if (MusicPlayer.isPlaying()) {
             rotateAnimator.resume();
             playIcon.setImageResource(R.mipmap.pause_icon);
             visualizerManager.resume();
-        }else {
+        } else {
             rotateAnimator.pause();
             visualizerManager.pause();
             playIcon.setImageResource(R.mipmap.play_icon);
         }
-        if(!isClock){
+        if (!isClock) {
             clock.setImageResource(R.mipmap.timing_icon);
-        }else {
+        } else {
             clock.setImageResource(R.mipmap.timing_select_icon);
         }
     }
 
     private void resetTime() {
         title.setText(((Song) MusicPlayer.getCurrentSong()).getName());
-        showLyric(((Song)MusicPlayer.getCurrentSong()).getLrc());
+        showLyric(((Song) MusicPlayer.getCurrentSong()).getLrc());
         seekbar.setProgress(0);
         startTime.setText("00:00");
         endTime.setText("00:00");
     }
 
     private void openAnimation() {
-        rotateAnimator = ObjectAnimator.ofFloat(playAlbumIcon,"rotation",0f,360f);
+        rotateAnimator = ObjectAnimator.ofFloat(playAlbumIcon, "rotation", 0f, 360f);
         rotateAnimator.setInterpolator(new LinearInterpolator());
         rotateAnimator.setRepeatCount(ValueAnimator.INFINITE);
         rotateAnimator.setDuration(10000);
@@ -343,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
     public void showLyric(String lrcStr) {
         if (lrcStr == null) {
             lrc.setLabel("暂无歌词");
@@ -353,9 +364,10 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
     private int currentSongMode(PlaybackMode mode) {
         int modeRes = R.mipmap.list_loop_icon;
-        switch (mode){
+        switch (mode) {
             case SINGLESONG:
                 modeRes = R.mipmap.singensong_icon;
                 break;
@@ -368,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return modeRes;
     }
+
     /**
      * 获取当前设备状态栏高度
      *
@@ -385,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(rotateAnimator!=null&&rotateAnimator.isRunning()){
+        if (rotateAnimator != null && rotateAnimator.isRunning()) {
             rotateAnimator.cancel();
             playAlbumIcon.clearAnimation();
         }
