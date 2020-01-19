@@ -34,6 +34,7 @@ import com.zyf.music.musiclibrary.utils.PlaybackMode;
 import com.zyf.music.widget.ClockSelectorPicker;
 import com.zyf.music.widget.LrcView;
 import com.zyf.music.widget.MyCircleBarRenderer;
+import com.zyf.music.widget.MyCircleWaveRenderer;
 import com.zyf.music.widget.SongSelectorPicker;
 
 import java.io.File;
@@ -43,6 +44,7 @@ import java.util.List;
 import me.bogerchan.niervisualizer.NierVisualizerManager;
 import me.bogerchan.niervisualizer.renderer.IRenderer;
 import me.bogerchan.niervisualizer.renderer.circle.CircleSolidRenderer;
+import me.bogerchan.niervisualizer.renderer.circle.CircleWaveRenderer;
 import me.bogerchan.niervisualizer.util.NierAnimator;
 
 import static com.zyf.music.utils.ClockSongUtils.isClock;
@@ -304,7 +306,8 @@ public class MainActivity extends AppCompatActivity {
             paint1.setColor(Color.parseColor("#FF4081"));
             visualizerManager.start(sv_wave, new IRenderer[]{new MyCircleBarRenderer(paint, 4, MyCircleBarRenderer.Type.TYPE_A,
                     0.3f, 2f, new NierAnimator(new LinearInterpolator(), 100, new float[]{0f, -90f}, false),true),
-                    new CircleSolidRenderer(paint1, 0.2f)
+                    new MyCircleWaveRenderer(paint1, 4,MyCircleWaveRenderer.Type.TYPE_A,0.3f, 2f,new NierAnimator(new LinearInterpolator(), 100, new float[]{0f, -90f},false)),
+                    new CircleWaveRenderer(paint1, 4,CircleWaveRenderer.Type.TYPE_B,0.27f, 1f,new NierAnimator(new LinearInterpolator(), 100, new float[]{0f, -90f},false))
             });
         }
     }
